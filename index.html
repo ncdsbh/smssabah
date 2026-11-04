@@ -30,6 +30,10 @@
                     <p class="text-xs text-gray-600 mt-0.5">Jabatan Kesihatan Negeri Sabah</p>
                 </div>
             </div>
+
+            <button onclick="toggleLanguage()" id="langBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-teal-100 hover:bg-teal-200 text-teal-800 border border-teal-300 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">
+                <i class="fas fa-language mr-1"></i> <span id="langText">EN</span>
+            </button>
         </div>
     </header>
 
@@ -227,42 +231,82 @@
             needsPHQ9: false, needsGAD7: false, suicideRisk: false
         };
 
+        let currentLang = 'ms'; // Global state
+
         const qAwal = [
             { 
                 type: 'w', 
-                instruction: 'Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-blue-600 bg-blue-100 px-2 rounded uppercase">1 Bulan Lepas</span>.',
-                q: '1. <span class="text-blue-600 font-bold">(SEBULAN LEPAS)</span> Adakah anda merasa murung, sedih atau tiada harapan?', 
-                opts: ['🟢 Tidak (0)', '🔴 Ya (1)'] 
+                instruction: {
+                    ms: 'Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-blue-600 bg-blue-100 px-2 rounded uppercase">1 Bulan Lepas</span>.',
+                    en: 'Over the past one month, have you been bothered by the following problems?'[cite: 3]
+                },
+                q: {
+                    ms: '1. <span class="text-blue-600 font-bold">(SEBULAN LEPAS)</span> Adakah anda merasa murung, sedih atau tiada harapan?',
+                    en: '1. <span class="text-blue-600 font-bold">(PAST 1 MONTH)</span> Feeling down, depressed or hopeless?'[cite: 3]
+                }, 
+                opts: {
+                    ms: ['🟢 Tidak (0)', '🔴 Ya (1)'],
+                    en: ['🟢 No (0)', '🔴 Yes (1)']
+                }
             },
-            { type: 'w', q: '2. <span class="text-blue-600 font-bold">(SEBULAN LEPAS)</span> Adakah anda kurang minat/keseronokan melakukan kerja?', opts: ['🟢 Tidak (0)', '🔴 Ya (1)'] },
+            { 
+                type: 'w', 
+                q: {
+                    ms: '2. <span class="text-blue-600 font-bold">(SEBULAN LEPAS)</span> Adakah anda kurang minat/keseronokan melakukan kerja?',
+                    en: '2. <span class="text-blue-600 font-bold">(PAST 1 MONTH)</span> Having little interest or pleasure in doing things?'[cite: 3]
+                }, 
+                opts: {
+                    ms: ['🟢 Tidak (0)', '🔴 Ya (1)'],
+                    en: ['🟢 No (0)', '🔴 Yes (1)']
+                }
+            },
             { 
                 type: 'g', 
                 spacerTitle: 'Saringan GAD-2', 
-                instruction: 'Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-red-600 bg-red-100 px-2 rounded uppercase">2 Minggu Lepas</span>.',
-                q: '3. <span class="text-red-600 font-bold">(2 MINGGU LEPAS)</span> Berasa resah, gelisah atau tegang.', 
-                opts: ['🟢 Tiada (0)', '🟡 Beberapa Hari (1)', '🟠 Lebih Seminggu (2)', '🔴 Setiap Hari (3)'] 
+                instruction: {
+                    ms: 'Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-red-600 bg-red-100 px-2 rounded uppercase">2 Minggu Lepas</span>.',
+                    en: 'Over the last 2 weeks, how often have you been bothered by any of the following problems?'[cite: 1, 3]
+                },
+                q: {
+                    ms: '3. <span class="text-red-600 font-bold">(2 MINGGU LEPAS)</span> Berasa resah, gelisah atau tegang.',
+                    en: '3. <span class="text-red-600 font-bold">(PAST 2 WEEKS)</span> Feeling nervous, anxious, or on edge.'[cite: 1]
+                }, 
+                opts: {
+                    ms: ['🟢 Tiada (0)', '🟡 Beberapa Hari (1)', '🟠 Lebih Seminggu (2)', '🔴 Setiap Hari (3)'],
+                    en: ['🟢 Not at all (0)', '🟡 Several days (1)', '🟠 More than half the days (2)', '🔴 Nearly everyday (3)'][cite: 1, 3]
+                }
             },
-            { type: 'g', q: '4. <span class="text-red-600 font-bold">(2 MINGGU LEPAS)</span> Tidak dapat menghentikan atau mengawal kebimbangan.', opts: ['🟢 Tiada (0)', '🟡 Beberapa Hari (1)', '🟠 Lebih Seminggu (2)', '🔴 Setiap Hari (3)'] }
+            { 
+                type: 'g', 
+                q: {
+                    ms: '4. <span class="text-red-600 font-bold">(2 MINGGU LEPAS)</span> Tidak dapat menghentikan atau mengawal kebimbangan.',
+                    en: '4. <span class="text-red-600 font-bold">(PAST 2 WEEKS)</span> Not being able to stop or control worrying'[cite: 1]
+                }, 
+                opts: {
+                    ms: ['🟢 Tiada (0)', '🟡 Beberapa Hari (1)', '🟠 Lebih Seminggu (2)', '🔴 Setiap Hari (3)'],
+                    en: ['🟢 Not at all (0)', '🟡 Several days (1)', '🟠 More than half the days (2)', '🔴 Nearly everyday (3)'][cite: 1, 3]
+                }
+            }
         ];
 
         const qPHQ9 = [
-            "Sedikit minat atau keseronokan dalam melakukan kerja.",
-            "Merasa murung, sedih atau tiada harapan.",
-            "Masalah hendak tidur / semasa tidur, tidur terlalu banyak.",
-            "Merasa letih atau kurang bertenaga.",
-            "Kurang selera atau terlalu banyak makan.",
-            "Mempunyai perasaan buruk terhadap diri sendiri - ataupun merasa gagal terhadap diri sendiri ataupun menghampakan diri atau keluarga.",
-            "Masalah menumpukan perhatian terhadap perkara seperti membaca surat khabar atau menonton televisyen.",
-            "Bergerak atau bercakap dengan terlalu lambat sehingga disedari oleh orang lain. Ataupun bertentangan - terlalu resah atau gelisah sehingga anda bergerak lebih dari biasa.",
-            "Berfikiran bahawa lebih elok jika anda telah mati atau ingin mencederakan diri anda dalam sesuatu cara."
+            { ms: "Sedikit minat atau keseronokan dalam melakukan kerja.", en: "Little interest or pleasure in doing things." },[cite: 3]
+            { ms: "Merasa murung, sedih atau tiada harapan.", en: "Feeling down, depressed or hopeless." },[cite: 3]
+            { ms: "Masalah hendak tidur / semasa tidur, tidur terlalu banyak.", en: "Trouble falling asleep/ staying asleep, sleeping too much." },[cite: 2, 3]
+            { ms: "Merasa letih atau kurang bertenaga.", en: "Feeling tired or having little energy." },[cite: 2]
+            { ms: "Kurang selera atau terlalu banyak makan.", en: "Poor appetite or overeating." },[cite: 2]
+            { ms: "Mempunyai perasaan buruk terhadap diri sendiri - ataupun merasa gagal terhadap diri sendiri ataupun menghampakan diri atau keluarga.", en: "Feeling bad about yourself - or that you are a failure or have let yourself or your family down." },[cite: 2]
+            { ms: "Masalah menumpukan perhatian terhadap perkara seperti membaca surat khabar atau menonton televisyen.", en: "Trouble concentrating on things, such as reading the newspaper or watching television." },[cite: 2]
+            { ms: "Bergerak atau bercakap dengan terlalu lambat sehingga disedari oleh orang lain. Ataupun bertentangan - terlalu resah atau gelisah sehingga anda bergerak lebih dari biasa.", en: "Moving or speaking so slowly that other people could have noticed. Or the opposite - being so fidgety or restless that you have been moving around a lot more than usual." },[cite: 2]
+            { ms: "Berfikiran bahawa lebih elok jika anda telah mati atau ingin mencederakan diri anda dalam sesuatu cara.", en: "Thoughts that you would be better off dead or of hurting yourself in some way." }[cite: 2]
         ];
 
         const qGAD5_Lanjut = [
-            "Terlalu bimbang mengenai pelbagai perkara yang berlainan.",
-            "Mempunyai masalah untuk bertenang.",
-            "Terlalu resah sehingga susah untuk berdiam diri.",
-            "Mudah menjadi rimas dan menjengkelkan.",
-            "Berasa takut bahawa sesuatu yang buruk akan terjadi."
+            { ms: "Terlalu bimbang mengenai pelbagai perkara yang berlainan.", en: "Worrying too much about different things" },[cite: 1]
+            { ms: "Mempunyai masalah untuk bertenang.", en: "Having trouble relaxing." },[cite: 1]
+            { ms: "Terlalu resah sehingga susah untuk berdiam diri.", en: "Being so restless that it is hard to sit still." },[cite: 1]
+            { ms: "Mudah menjadi rimas dan menjengkelkan.", en: "Being easily annoyed or irritable." },[cite: 1]
+            { ms: "Berasa takut bahawa sesuatu yang buruk akan terjadi.", en: "Feeling afraid as if something awful might happen." }[cite: 1]
         ];
 
         // --- INIT VIA FETCH API ---
@@ -590,7 +634,9 @@
         function renderQ(qArray, containerId, prefix) {
             let html = '';
             qArray.forEach((item, i) => {
-                if (typeof item === 'object') {
+                
+                if (typeof item === 'object' && item.type) {
+                    // Handle complex questions (Whooley/GAD-2)
                     if (item.spacerTitle) {
                         html += `<div class="flex items-center py-4">
                                     <div class="flex-grow border-t-2 border-dashed border-teal-200"></div>
@@ -599,14 +645,29 @@
                                  </div>`;
                     }
                     if (item.instruction) {
+                        const instText = item.instruction[currentLang] || item.instruction.ms;
+                        const instTitle = currentLang === 'en' ? "Instructions:" : "Arahan:";
                         html += `<div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded-lg">
-                                    <p class="font-bold text-blue-900">Arahan:</p>
-                                    <p class="text-sm text-blue-800 mt-1">${item.instruction}</p>
+                                    <p class="font-bold text-blue-900">${instTitle}</p>
+                                    <p class="text-sm text-blue-800 mt-1">${instText}</p>
                                  </div>`;
                     }
                 }
-                const qText = typeof item === 'object' ? item.q : `${i+1}. ${item}`;
-                const opts = typeof item === 'object' ? item.opts : ['🟢 Tiada (0)', '🟡 Beberapa Hari (1)', '🟠 Lebih Seminggu (2)', '🔴 Setiap Hari (3)'];
+
+                // Extract text based on current language
+                let qText = "";
+                let opts = [];
+
+                if (item.type) {
+                    qText = item.q[currentLang] || item.q.ms;
+                    opts = item.opts[currentLang] || item.opts.ms;
+                } else {
+                    qText = `${i+1}. ${item[currentLang] || item.ms}`;
+                    opts = currentLang === 'en' 
+                        ? ['🟢 Not at all (0)', '🟡 Several days (1)', '🟠 More than half the days (2)', '🔴 Nearly everyday (3)'][cite: 1, 3]
+                        : ['🟢 Tiada (0)', '🟡 Beberapa Hari (1)', '🟠 Lebih Seminggu (2)', '🔴 Setiap Hari (3)'];
+                }
+
                 const gridClass = opts.length === 2 ? "grid grid-cols-2 gap-4 max-w-sm mx-auto mt-4" : "grid grid-cols-2 md:grid-cols-4 gap-2 mt-4";
                 
                 html += `<div class="bg-gray-50 p-4 md:p-6 rounded-lg border mb-4">
@@ -614,8 +675,11 @@
                             <div class="${gridClass}">`;
                 
                 opts.forEach((opt, v) => {
+                    // Read existing checked state to maintain selections during translation
+                    const isChecked = document.querySelector(`input[name="${prefix}_${i}"][value="${v}"]`)?.checked ? 'checked' : '';
+                    
                     html += `<div>
-                                <input type="radio" name="${prefix}_${i}" id="${prefix}_${i}_${v}" value="${v}" class="hidden emoji-radio">
+                                <input type="radio" name="${prefix}_${i}" id="${prefix}_${i}_${v}" value="${v}" class="hidden emoji-radio" ${isChecked}>
                                 <label for="${prefix}_${i}_${v}" class="block h-full border rounded p-3 text-center cursor-pointer text-sm font-medium flex items-center justify-center transition-all duration-200 hover:bg-teal-50">${opt}</label>
                              </div>`;
                 });
@@ -887,6 +951,20 @@
                 alertBox.classList.add('hidden');
                 alertBox.classList.remove('flex');
             }, 200); 
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ms' ? 'en' : 'ms';
+            document.getElementById('langText').innerText = currentLang === 'ms' ? 'EN' : 'MS';
+
+            // Re-render the active screening sections
+            if (!document.getElementById('partAwal').classList.contains('hidden')) {
+                renderQ(qAwal, 'awalContainer', 'awal');
+            }
+            if (!document.getElementById('partLanjut').classList.contains('hidden')) {
+                if (state.needsPHQ9) renderQ(qPHQ9, 'phqBox', 'phq');
+                if (state.needsGAD7) renderQ(qGAD5_Lanjut, 'gadBox', 'gad');
+            }
         }
     </script>
 </body>
