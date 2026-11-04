@@ -357,46 +357,76 @@
 
         function populateInitialData(data) {
             masterClinics = data.clinics;
+            
+            // --- 1. Placeholder Daerah ---
             const daerahSel = document.getElementById('daerah');
             const uniqueDaerah = [...new Set(masterClinics.map(c => c.daerah))].sort();
             
-            const defDaerah = currentLang === 'en' ? '-- Select District --' : '-- Pilih Daerah --';
-            daerahSel.innerHTML = `<option value="">${defDaerah}</option>`;
+            daerahSel.innerHTML = `<option value="" class="trans" data-ms="-- Pilih Daerah --" data-en="-- Select District --">${currentLang === 'en' ? '-- Select District --' : '-- Pilih Daerah --'}</option>`;
             uniqueDaerah.forEach(d => { daerahSel.innerHTML += `<option value="${d}">${d}</option>`; });
 
+            // --- 2. Placeholder Bangsa ---
             const bangsaSel = document.getElementById('bangsaSelect');
-            const defBangsa = currentLang === 'en' ? '-- Select Race --' : '-- Pilih Bangsa --';
-            const lainBangsa = currentLang === 'en' ? 'Others (Please Specify)' : 'Lain-lain (Sila Nyatakan)';
-            bangsaSel.innerHTML = `<option value="">${defBangsa}</option>`;
+            bangsaSel.innerHTML = `<option value="" class="trans" data-ms="-- Pilih Bangsa --" data-en="-- Select Race --">${currentLang === 'en' ? '-- Select Race --' : '-- Pilih Bangsa --'}</option>`;
             data.bangsa.forEach(b => { bangsaSel.innerHTML += `<option value="${b}">${b}</option>`; });
-            bangsaSel.innerHTML += `<option value="Lain-lain">${lainBangsa}</option>`;
+            
+            // Pilihan Lain-lain untuk Bangsa
+            const textLainBangsaMS = "Lain-lain (Sila Nyatakan)";
+            const textLainBangsaEN = "Others (Please Specify)";
+            bangsaSel.innerHTML += `<option value="Lain-lain" class="trans" data-ms="${textLainBangsaMS}" data-en="${textLainBangsaEN}">${currentLang === 'en' ? textLainBangsaEN : textLainBangsaMS}</option>`;
+
+            // --- 3. Daftar Komorbid beserta Kamus Terjemahannya ---
+            // Kamus ini memetakan data dari Google Sheet ke Bahasa Inggris
+            const komorbidDict = {
+                "Tiada": "None",
+                "Kencing Manis": "Diabetes",
+                "Darah Tinggi": "High Blood Pressure",
+                "Kolesterol tinggi": "High Cholesterol",
+                "Kanser": "Cancer",
+                "Penyakit Mental": "Mental Illness"
+            };
 
             const kContainer = document.getElementById('komorbidContainer');
             kContainer.innerHTML = '';
+            
             data.komorbid.forEach(k => {
                 let isTiada = k.trim().toLowerCase() === 'tiada';
                 let idAttr = isTiada ? 'id="cbTiada"' : '';
+                
+                // Cari terjemahan di kamus, jika tidak ada gunakan nama aslinya (misalnya untuk entri baru)
+                let termEN = komorbidDict[k.trim()] || k.trim();
+                let displayText = currentLang === 'en' ? termEN : k;
+                
                 kContainer.innerHTML += `
                     <label class="flex items-start space-x-2 cursor-pointer">
                         <input type="checkbox" ${idAttr} name="komorbidCb" value="${k}" class="mt-1 komorbid-cb text-teal-600 rounded" onchange="handleKomorbid(this)">
-                        <span class="text-sm text-gray-700">${k}</span>
+                        <span class="text-sm text-gray-700 trans" data-ms="${k}" data-en="${termEN}">${displayText}</span>
                     </label>
                 `;
             });
-            const lainKomorbid = currentLang === 'en' ? 'Others (Specify)' : 'Lain-lain (Nyatakan)';
+            
+            // Pilihan Lain-lain untuk Komorbid
+            const textLainKomorbidMS = "Lain-lain (Nyatakan)";
+            const textLainKomorbidEN = "Others (Specify)";
             kContainer.innerHTML += `
                 <label class="flex items-start space-x-2 cursor-pointer">
                     <input type="checkbox" id="cbLain" value="Lain-lain" onchange="handleKomorbid(this)" class="mt-1 komorbid-cb text-teal-600 rounded">
-                    <span class="text-sm text-gray-700">${lainKomorbid}</span>
+                    <span class="text-sm text-gray-700 trans" data-ms="${textLainKomorbidMS}" data-en="${textLainKomorbidEN}">${currentLang === 'en' ? textLainKomorbidEN : textLainKomorbidMS}</span>
                 </label>
             `;
 
+            // --- 4. Tombol GPS ---
             const btnGps = document.getElementById('btnGps');
             if (btnGps) {
                 btnGps.disabled = false;
                 btnGps.className = "text-xs bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded flex items-center transition";
                 document.getElementById('gpsIcon').className = "fas fa-location-arrow mr-1";
-                document.getElementById('gpsText').textContent = currentLang === 'en' ? "Find Nearby Clinic" : "Cari Klinik Berdekatan";
+                
+                const gpsTextEl = document.getElementById('gpsText');
+                gpsTextEl.classList.add('trans');
+                gpsTextEl.dataset.ms = "Cari Klinik Berdekatan";
+                gpsTextEl.dataset.en = "Find Nearby Clinic";
+                gpsTextEl.textContent = currentLang === 'en' ? "Find Nearby Clinic" : "Cari Klinik Berdekatan";
             }
         }
 
@@ -441,7 +471,8 @@
             const d = document.getElementById('daerah').value;
             const fasSel = document.getElementById('fasiliti');
             
-            fasSel.innerHTML = currentLang === 'en' ? '<option value="">-- Select Facility --</option>' : '<option value="">-- Pilih Fasiliti --</option>';
+            // Set Placeholder untuk Fasiliti
+            fasSel.innerHTML = `<option value="" class="trans" data-ms="-- Pilih Fasiliti --" data-en="-- Select Facility --">${currentLang === 'en' ? '-- Select Facility --' : '-- Pilih Fasiliti --'}</option>`;
             fasSel.disabled = !d;
 
             if(d) {
