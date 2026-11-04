@@ -398,8 +398,8 @@
                 let displayText = currentLang === 'en' ? termEN : k;
                 
                 kContainer.innerHTML += `
-                    <label class="flex items-start space-x-2 cursor-pointer">
-                        <input type="checkbox" ${idAttr} name="komorbidCb" value="${k}" class="mt-1 komorbid-cb text-teal-600 rounded" onchange="handleKomorbid(this)">
+                    <label class="flex items-center space-x-2 cursor-pointer py-0.5">
+                        <input type="checkbox" ${idAttr} name="komorbidCb" value="${k}" class="komorbid-cb text-teal-600 rounded" onchange="handleKomorbid(this)">
                         <span class="text-sm text-gray-700 trans" data-ms="${k}" data-en="${termEN}">${displayText}</span>
                     </label>
                 `;
@@ -409,8 +409,8 @@
             const textLainKomorbidMS = "Lain-lain (Nyatakan)";
             const textLainKomorbidEN = "Others (Specify)";
             kContainer.innerHTML += `
-                <label class="flex items-start space-x-2 cursor-pointer">
-                    <input type="checkbox" id="cbLain" value="Lain-lain" onchange="handleKomorbid(this)" class="mt-1 komorbid-cb text-teal-600 rounded">
+                <label class="flex items-center space-x-2 cursor-pointer py-0.5">
+                    <input type="checkbox" id="cbLain" value="Lain-lain" onchange="handleKomorbid(this)" class="komorbid-cb text-teal-600 rounded">
                     <span class="text-sm text-gray-700 trans" data-ms="${textLainKomorbidMS}" data-en="${textLainKomorbidEN}">${currentLang === 'en' ? textLainKomorbidEN : textLainKomorbidMS}</span>
                 </label>
             `;
