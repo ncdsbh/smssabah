@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="ms">
+<!-- [Head, CSS, and Body elements remain identical to your previous version] -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saringan Minda Sihat - Sabah</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Nunito', sans-serif; background: linear-gradient(225deg, #fce7f3 0%, #d1fae5 100%); min-height: 100vh; }
+        .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        .emoji-radio:checked + label { background-color: #ccfbf1; border-color: #14b8a6; font-weight: bold; }
+        .hidden-section { display: none; }
+        .visible-section { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #0d9488; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-gray-700">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-center">
+            <div class="flex flex-col items-center space-y-2 text-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" class="h-14 w-auto" alt="Jata Negara Malaysia">
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold text-teal-700 leading-tight">Saringan Minda Sihat</h1>
+                    <p class="text-xs text-gray-600 mt-0.5">Jabatan Kesihatan Negeri Sabah</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-4xl">
+        <div id="sectionA" class="visible-section bg-white rounded-2xl card-shadow p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-teal-800 mb-6 border-b pb-2">Maklumat Saringan</h2>
+            
+            <form id="formDemographics" class="space-y-6">
+                <div class="bg-teal-50 p-4 rounded-xl border border-teal-100">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-teal-800">Pemilihan Fasiliti</h3>
+                        <div class="flex space-x-2">
+                            <button type="button" id="btnRefreshCache" onclick="refreshCache()" class="text-xs bg-white border border-teal-300 hover:bg-teal-50 text-teal-700 px-3 py-1.5 rounded flex items-center transition shadow-sm" title="Muat turun senarai fasiliti terkini">
+                                <i id="refreshIcon" class="fas fa-sync-alt mr-1"></i> 
+                                <span class="hidden sm:inline">Refresh Data</span>
+                            </button>
+                            <button type="button" id="btnGps" onclick="getLocation()" disabled class="text-xs bg-gray-400 cursor-not-allowed text-white px-3 py-1.5 rounded flex items-center transition">
+                                <i id="gpsIcon" class="fas fa-spinner fa-spin mr-1"></i> 
+                                <span id="gpsText">Sedia GPS...</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Daerah</label>
+                            <select id="daerah" onchange="updateFasiliti()" class="w-full px-4 py-2 rounded-lg border outline-none bg-white" required>
+                                <option value="">Memuatkan data...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold mb-1">Klinik / Fasiliti<span class="text-red-500">*</span></label>
+                            <select id="fasiliti" class="w-full px-4 py-2 rounded-lg border outline-none bg-white" disabled required>
+                                <option value="">Pilih Daerah dahulu</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Kategori Saringan</label>
+                    <div class="flex space-x-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="kategori" value="Saringan Awam" onchange="toggleAlamat()" checked class="text-teal-600">
+                            <span>Saringan Awam</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="kategori" value="Kakitangan Kesihatan" onchange="toggleAlamat()" class="text-teal-600">
+                            <span>Kakitangan Kesihatan</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1">Nama Penuh<span class="text-red-500">*</span></label>
+                        <input type="text" id="nama" class="w-full px-4 py-2 rounded-lg border outline-none uppercase" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Warganegara</label>
+                        <select id="warganegara" onchange="handleWarganegara()" class="w-full px-4 py-2 rounded-lg border outline-none">
+                            <option value="Warganegara">Warganegara Malaysia</option>
+                            <option value="Bukan Warganegara">Bukan Warganegara</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">No. KP / Passport<span class="text-red-500">*</span></label>
+                        <input type="text" id="ic" oninput="extractIC()" class="w-full px-4 py-2 rounded-lg border outline-none" required placeholder="Contoh: 801231125678">
+                        <p id="icError" class="text-xs text-red-500 mt-1 hidden">Format IC tidak sah (12 digit sahaja).</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Umur<span class="text-red-500">*</span></label>
+                        <input type="number" id="umur" class="w-full px-4 py-2 rounded-lg border bg-gray-100" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Jantina<span class="text-red-500">*</span></label>
+                        <select id="jantina" class="w-full px-4 py-2 rounded-lg border bg-gray-100" required>
+                            <option value="">-</option>
+                            <option value="Lelaki">Lelaki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">No. Telefon<span class="text-red-500">*</span></label>
+                        <input type="tel" id="telefon" class="w-full px-4 py-2 rounded-lg border outline-none" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold mb-1">Bangsa / Etnik<span class="text-red-500">*</span></label>
+                        <select id="bangsaSelect" onchange="toggleBangsaLain()" class="w-full px-4 py-2 rounded-lg border outline-none bg-white" required>
+                            <option value="">Memuatkan data...</option>
+                        </select>
+                        <input type="text" id="bangsaLain" class="w-full px-4 py-2 rounded-lg border outline-none mt-2 hidden" placeholder="Sila nyatakan bangsa anda">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1" id="labelAlamat">Alamat Kediaman<span class="text-red-500">*</span></label>
+                        <textarea id="alamat" rows="2" class="w-full px-4 py-2 rounded-lg border outline-none" required></textarea>
+                    </div>
+
+                    <div class="md:col-span-2 relative">
+                        <input type="text" id="komorbidValidator" class="absolute top-12 left-1/2 transform -translate-x-1/2 w-1 h-1 opacity-0 pointer-events-none" required tabindex="-1">
+                        
+                        <label class="block text-sm font-semibold mb-2">Sejarah Penyakit Peribadi (Komorbid)<span class="text-red-500">*</span></label>
+                        <p class="text-xs italic text-gray-500 mb-3">Yang memerlukan janji temu atau rawatan berterusan di fasiliti kesihatan<span class="text-red-500">*</span></p>
+                        
+                        <div id="komorbidContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-4 rounded-lg border shadow-sm">
+                            <span class="text-gray-500 text-sm">Memuatkan data...</span>
+                        </div>
+                        
+                        <input type="text" id="komorbidLain" class="w-full px-4 py-2 rounded-lg border outline-none mt-2 hidden" placeholder="Sila nyatakan penyakit lain (pisahkan dengan koma)">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-semibold mb-1">Email (Sekiranya perlu)</label>
+                        <input type="email" id="email" class="w-full px-4 py-2 rounded-lg border outline-none">
+                    </div>
+                </div>
+
+                <div class="pt-6 text-center">
+                    <button type="button" id="btnMulaSaringan" onclick="startScreening()" class="bg-teal-600 text-white font-bold py-3 px-8 rounded-full shadow hover:bg-teal-700 transition">Mula Saringan <i class="fas fa-arrow-right ml-2"></i></button>
+                </div>
+            </form>
+        </div>
+
+        <div id="sectionScreening" class="hidden-section bg-white rounded-2xl card-shadow p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 border-b pb-2">Soalan Saringan</h2>
+            
+            <div id="partAwal">
+                <h3 class="font-bold text-lg text-indigo-700 mb-2">Bahagian 1: Whooley & GAD-2</h3>
+                <div id="awalContainer" class="space-y-4 mb-6"></div>
+                
+                <div class="flex items-center justify-between mt-6">
+                    <button type="button" onclick="goBackToDemografi()" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-full font-bold transition"><i class="fas fa-arrow-left mr-2"></i> Kembali</button>
+                    <button type="button" onclick="evalAwal()" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded-full font-bold transition">Seterusnya <i class="fas fa-arrow-right ml-2"></i></button>
+                </div>
+            </div>
+
+            <div id="partLanjut" class="hidden mt-8 border-t-4 border-red-400 pt-6">
+                <div id="lanjutContainer" class="mb-6"></div>
+                
+                <div id="loadingSubmit" class="hidden flex items-center justify-center space-x-3 my-4">
+                    <div class="loader"></div>
+                    <span class="text-teal-700 font-bold">Menghantar Data... Sila Tunggu.</span>
+                </div>
+
+                <div class="flex items-center justify-between mt-6" id="actionButtonsLanjut">
+                    <button type="button" onclick="goBackToAwal()" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-full font-bold transition"><i class="fas fa-arrow-left mr-2"></i> Kembali</button>
+                    <button type="button" id="btnSubmitFinal" onclick="submitFinal()" class="bg-teal-600 hover:bg-teal-700 text-white py-2 px-6 rounded-full font-bold transition">Simpan & Lihat Keputusan</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="sectionResult" class="hidden-section bg-white rounded-2xl card-shadow p-6 md:p-8 text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">Keputusan Saringan</h2>
+            <div id="resultContent" class="space-y-4 text-center"></div>
+            
+            <div id="riskAlert" class="hidden mt-6 bg-red-50 border-l-4 border-red-500 p-6 rounded-lg text-center">
+                <i class="fas fa-heart text-red-500 text-4xl mb-3 animate-pulse"></i>
+                <h3 class="text-xl font-bold text-red-800">Hubungi Talian HEAL: <a href="tel:15555" class="underline hover:text-red-600 transition-colors">15555</a></h3>
+                <p>Sila berjumpa dengan kakitangan di fasiliti saringan anda ATAU dapatkan temujanji di fasiliti kesihatan terdekat.</p>
+            </div>
+
+            <button onclick="window.location.reload()" class="mt-8 bg-gray-500 text-white py-2 px-6 rounded-full font-bold">Saringan Baru</button>
+        </div>
+
+        <!-- CUSTOM ALERT MODAL -->
+        <div id="customAlertBox" class="fixed inset-0 z-[100] hidden items-center justify-center bg-gray-900 bg-opacity-50 backdrop-blur-sm px-4 transition-opacity duration-300">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center transform transition-all scale-95 opacity-0" id="customAlertContent">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4" id="alertIconBg">
+                    <i class="fas fa-exclamation-triangle text-red-500 text-2xl" id="alertIcon"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2" id="customAlertTitle">Perhatian</h3>
+                <p class="text-gray-600 mb-6" id="customAlertMessage">Mesej di sini</p>
+                <button onclick="closeCustomAlert()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl transition-colors">
+                    Faham
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ==========================================================
+        // 🔴 PASTE YOUR NEW GOOGLE APPS SCRIPT WEB APP URL HERE:
+        // ==========================================================
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyamsXGXxZ9aeoxU8LXtjyHXJuKV9_-uuyDXXVwAlz_2pTIoL_J_yCwC-IRP38lYkHt9g/exec";
+        
+        let masterClinics = [];
+        let state = {
+            whooleyAnswers: [], gad2Answers: [], phq9Answers: [], gad7Answers: [],
+            needsPHQ9: false, needsGAD7: false, suicideRisk: false
+        };
+
+        const qAwal = [
+            { 
+                type: 'w', 
+                instruction: 'Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-blue-600 bg-blue-100 px-2 rounded uppercase">1 Bulan Lepas</span>.',
+                q: '1. <span class="text-blue-600 font-bold">(SEBULAN LEPAS)</span> Adakah anda merasa murung, sedih atau tiada harapan?', 
+                opts: ['🟢 Tidak (0)', '🔴 Ya (1)'] 
+            },
+            { type: 'w', q: '2. <span class="text-blue-600 font-bold">(SEBULAN LEPAS)</span> Adakah anda kurang minat/keseronokan melakukan kerja?', opts: ['🟢 Tidak (0)', '🔴 Ya (1)'] },
+            { 
+                type: 'g', 
+                spacerTitle: 'Saringan GAD-2', 
+                instruction: 'Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-red-600 bg-red-100 px-2 rounded uppercase">2 Minggu Lepas</span>.',
+                q: '3. <span class="text-red-600 font-bold">(2 MINGGU LEPAS)</span> Berasa resah, gelisah atau tegang.', 
+                opts: ['🟢 Tiada (0)', '🟡 Beberapa Hari (1)', '🟠 Lebih Seminggu (2)', '🔴 Setiap Hari (3)'] 
+            },
+            { type: 'g', q: '4. <span class="text-red-600 font-bold">(2 MINGGU LEPAS)</span> Tidak dapat menghentikan atau mengawal kebimbangan.', opts: ['🟢 Tiada (0)', '🟡 Beberapa Hari (1)', '🟠 Lebih Seminggu (2)', '🔴 Setiap Hari (3)'] }
+        ];
+
+        const qPHQ9 = [
+            "Sedikit minat atau keseronokan dalam melakukan kerja.",
+            "Merasa murung, sedih atau tiada harapan.",
+            "Masalah hendak tidur / semasa tidur, tidur terlalu banyak.",
+            "Merasa letih atau kurang bertenaga.",
+            "Kurang selera atau terlalu banyak makan.",
+            "Mempunyai perasaan buruk terhadap diri sendiri - ataupun merasa gagal terhadap diri sendiri ataupun menghampakan diri atau keluarga.",
+            "Masalah menumpukan perhatian terhadap perkara seperti membaca surat khabar atau menonton televisyen.",
+            "Bergerak atau bercakap dengan terlalu lambat sehingga disedari oleh orang lain. Ataupun bertentangan - terlalu resah atau gelisah sehingga anda bergerak lebih dari biasa.",
+            "Berfikiran bahawa lebih elok jika anda telah mati atau ingin mencederakan diri anda dalam sesuatu cara."
+        ];
+
+        const qGAD5_Lanjut = [
+            "Terlalu bimbang mengenai pelbagai perkara yang berlainan.",
+            "Mempunyai masalah untuk bertenang.",
+            "Terlalu resah sehingga susah untuk berdiam diri.",
+            "Mudah menjadi rimas dan menjengkelkan.",
+            "Berasa takut bahawa sesuatu yang buruk akan terjadi."
+        ];
+
+        // --- INIT VIA FETCH API ---
+        window.onload = () => {
+            fetch(GAS_API_URL + "?action=getInitialData")
+                .then(response => response.json())
+                .then(data => populateInitialData(data))
+                .catch(err => {
+                    console.error("Error loading data:", err);
+                    showCustomAlert("Gagal menghubungi pangkalan data. Sila semak sambungan internet anda.", "Ralat Sistem");
+                });
+                
+            renderQ(qAwal, 'awalContainer', 'awal');
+        };
+        
+        function populateInitialData(data) {
+            masterClinics = data.clinics;
+            const daerahSel = document.getElementById('daerah');
+            const uniqueDaerah = [...new Set(masterClinics.map(c => c.daerah))].sort();
+            daerahSel.innerHTML = '<option value="">-- Pilih Daerah --</option>';
+            uniqueDaerah.forEach(d => { daerahSel.innerHTML += `<option value="${d}">${d}</option>`; });
+
+            const bangsaSel = document.getElementById('bangsaSelect');
+            bangsaSel.innerHTML = '<option value="">-- Pilih Bangsa --</option>';
+            data.bangsa.forEach(b => { bangsaSel.innerHTML += `<option value="${b}">${b}</option>`; });
+            bangsaSel.innerHTML += `<option value="Lain-lain">Lain-lain (Sila Nyatakan)</option>`;
+
+            const kContainer = document.getElementById('komorbidContainer');
+            kContainer.innerHTML = '';
+            data.komorbid.forEach(k => {
+                let isTiada = k.trim().toLowerCase() === 'tiada';
+                let idAttr = isTiada ? 'id="cbTiada"' : '';
+                kContainer.innerHTML += `
+                    <label class="flex items-start space-x-2 cursor-pointer">
+                        <input type="checkbox" ${idAttr} name="komorbidCb" value="${k}" class="mt-1 komorbid-cb text-teal-600 rounded" onchange="handleKomorbid(this)">
+                        <span class="text-sm text-gray-700">${k}</span>
+                    </label>
+                `;
+            });
+            kContainer.innerHTML += `
+                <label class="flex items-start space-x-2 cursor-pointer">
+                    <input type="checkbox" id="cbLain" value="Lain-lain" onchange="handleKomorbid(this)" class="mt-1 komorbid-cb text-teal-600 rounded">
+                    <span class="text-sm text-gray-700">Lain-lain (Nyatakan)</span>
+                </label>
+            `;
+
+            const btnGps = document.getElementById('btnGps');
+            if (btnGps) {
+                btnGps.disabled = false;
+                btnGps.className = "text-xs bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded flex items-center transition";
+                document.getElementById('gpsIcon').className = "fas fa-location-arrow mr-1";
+                document.getElementById('gpsText').textContent = "Cari Klinik Berdekatan";
+            }
+        }
+
+        // --- REFRESH CACHE LOGIC VIA FETCH API ---
+        function refreshCache() {
+            const btnRefresh = document.getElementById('btnRefreshCache');
+            const iconRefresh = document.getElementById('refreshIcon');
+            const daerahSel = document.getElementById('daerah');
+            const fasSel = document.getElementById('fasiliti');
+            
+            btnRefresh.disabled = true;
+            iconRefresh.classList.add('fa-spin');
+            daerahSel.innerHTML = '<option value="">Memuat turun data terkini...</option>';
+            fasSel.innerHTML = '<option value="">Pilih Daerah dahulu</option>';
+            fasSel.disabled = true;
+            
+            fetch(GAS_API_URL + "?action=clearCache")
+                .then(res => res.json())
+                .then(() => {
+                    return fetch(GAS_API_URL + "?action=getInitialData");
+                })
+                .then(res => res.json())
+                .then(data => {
+                    populateInitialData(data);
+                    iconRefresh.classList.remove('fa-spin');
+                    btnRefresh.disabled = false;
+                    showCustomAlert("Senarai fasiliti telah berjaya dikemaskini.", "Berjaya", true);
+                })
+                .catch(err => {
+                    iconRefresh.classList.remove('fa-spin');
+                    btnRefresh.disabled = false;
+                    showCustomAlert("Ralat: " + err.message, "Ralat Sistem");
+                });
+        }
+
+        function updateFasiliti() {
+            const d = document.getElementById('daerah').value;
+            const fasSel = document.getElementById('fasiliti');
+            
+            fasSel.innerHTML = '<option value="">-- Pilih Fasiliti --</option>';
+            fasSel.disabled = !d;
+
+            if(d) {
+                const filtered = masterClinics.filter(c => c.daerah === d).sort((a,b) => a.fasiliti.localeCompare(b.fasiliti));
+                filtered.forEach(f => { fasSel.innerHTML += `<option value="${f.fasiliti}">${f.fasiliti}</option>`; });
+            }
+        }
+
+        function toggleBangsaLain() {
+            const sel = document.getElementById('bangsaSelect').value;
+            const input = document.getElementById('bangsaLain');
+            if(sel === 'Lain-lain') {
+                input.classList.remove('hidden'); input.required = true;
+            } else {
+                input.classList.add('hidden'); input.required = false; input.value = '';
+            }
+        }
+
+        function handleKomorbid(clickedElement) {
+            const cbTiada = document.getElementById('cbTiada');
+            const cbLain = document.getElementById('cbLain');
+            const inputLain = document.getElementById('komorbidLain');
+            const allCb = document.querySelectorAll('.komorbid-cb');
+
+            if (cbTiada && clickedElement === cbTiada && cbTiada.checked) {
+                allCb.forEach(cb => { if (cb !== cbTiada) cb.checked = false; });
+            } else if (cbTiada && clickedElement !== cbTiada && clickedElement.checked) {
+                cbTiada.checked = false;
+            }
+
+            if (cbLain && cbLain.checked) {
+                inputLain.classList.remove('hidden'); inputLain.required = true;
+            } else {
+                inputLain.classList.add('hidden'); inputLain.required = false; inputLain.value = ''; 
+            }
+            validateKomorbid();
+        }
+
+        function validateKomorbid() {
+            const checked = document.querySelectorAll('.komorbid-cb:checked').length;
+            document.getElementById('komorbidValidator').value = checked > 0 ? "Valid" : "";
+        }
+
+        function getLocation() {
+            const btnGps = document.getElementById('btnGps');
+            const originalHtml = btnGps.innerHTML;
+            
+            btnGps.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Mencari...`;
+            btnGps.disabled = true;
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        
+                        masterClinics.forEach(c => {
+                            c.distance = (c.lat && c.lng) ? calcDistance(userLat, userLng, c.lat, c.lng) : 99999;
+                        });
+
+                        masterClinics.sort((a, b) => a.distance - b.distance);
+                        const closest = masterClinics[0];
+                        
+                        if(closest && closest.distance < 99999) {
+                            document.getElementById('daerah').value = closest.daerah;
+                            updateFasiliti();
+                            document.getElementById('fasiliti').value = closest.fasiliti;
+                            showCustomAlert(`GPS menemui fasiliti terdekat: ${closest.fasiliti} (${closest.distance.toFixed(1)} km)`, "Berjaya", true);
+                        } else {
+                            showCustomAlert("Sistem gagal mengira jarak. Tiada koordinat klinik dalam pangkalan data.", "Ralat Data");
+                        }
+                        btnGps.innerHTML = originalHtml;
+                        btnGps.disabled = false;
+                    }, 
+                    error => { 
+                        btnGps.innerHTML = originalHtml;
+                        btnGps.disabled = false;
+                        let errMsg = "Akses lokasi ditolak atau gagal.";
+                        if (error.code === 1) errMsg = "Sistem pelayar menyekat akses GPS.";
+                        if (error.code === 2) errMsg = "Signal GPS tidak ditemui.";
+                        if (error.code === 3) errMsg = "Carian GPS Timeout.";
+                        showCustomAlert(errMsg, "Ralat GPS"); 
+                    },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+                );
+            } else {
+                showCustomAlert("Peranti anda tidak menyokong fungsi GPS.", "Ralat Sistem");
+                btnGps.innerHTML = originalHtml;
+                btnGps.disabled = false;
+            }
+        }
+
+        function calcDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2-lat1) * Math.PI / 180;
+            const dLon = (lon2-lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        function toggleAlamat() {
+            const isStaff = document.querySelector('input[name="kategori"]:checked').value.includes("Kakitangan");
+            document.getElementById('labelAlamat').textContent = isStaff ? "Tempat Bertugas (Bahagian/Cawangan/Unit/Fasiliti)" : "Alamat Kediaman";
+        }
+
+        function handleWarganegara() {
+            const isWarga = document.getElementById('warganegara').value === "Warganegara";
+            const umurInput = document.getElementById('umur');
+            const jantinaInput = document.getElementById('jantina');
+            const icInput = document.getElementById('ic');
+            
+            umurInput.readOnly = isWarga;
+            jantinaInput.disabled = isWarga;
+            
+            if(isWarga) {
+                umurInput.classList.add('bg-gray-100');
+                jantinaInput.classList.add('bg-gray-100');
+                icInput.placeholder = "Contoh: 801231125678";
+                extractIC(); 
+            } else {
+                umurInput.classList.remove('bg-gray-100');
+                jantinaInput.classList.remove('bg-gray-100');
+                icInput.placeholder = "Sila masukkan No. Passport";
+                document.getElementById('icError').classList.add('hidden'); 
+                umurInput.value = "";
+                jantinaInput.value = "";
+            }
+        }
+
+        function extractIC() {
+            if(document.getElementById('warganegara').value !== "Warganegara") {
+                document.getElementById('icError').classList.add('hidden');
+                return;
+            }
+            
+            const ic = document.getElementById('ic').value;
+            const errorElement = document.getElementById('icError');
+            const umurElement = document.getElementById('umur');
+            const jantinaElement = document.getElementById('jantina');
+            
+            if(ic.length === 12 && /^\d+$/.test(ic)) {
+                const yy = parseInt(ic.substring(0, 2));
+                const mm = parseInt(ic.substring(2, 4));
+                const dd = parseInt(ic.substring(4, 6));
+
+                if (mm < 1 || mm > 12) return showError();
+
+                const currentYear = new Date().getFullYear();
+                const currentCentury = Math.floor(currentYear / 100) * 100;
+                let fullYear = yy + (yy > currentYear % 100 ? currentCentury - 100 : currentCentury);
+                
+                const daysInMonth = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                if (fullYear % 4 === 0 && (fullYear % 100 !== 0 || fullYear % 400 === 0)) daysInMonth[2] = 29;
+                
+                if (dd < 1 || dd > daysInMonth[mm]) return showError();
+
+                errorElement.classList.add('hidden');
+                umurElement.value = currentYear - fullYear;
+                jantinaElement.value = (parseInt(ic.charAt(11)) % 2 === 0) ? "Perempuan" : "Lelaki";
+            } else {
+                showError();
+            }
+
+            function showError() {
+                errorElement.classList.remove('hidden');
+                umurElement.value = ""; 
+                jantinaElement.value = ""; 
+            }
+        }
+
+        function startScreening() {
+            const form = document.getElementById('formDemographics');
+            if (!form.checkValidity()) return form.reportValidity(); 
+
+            const btn = document.getElementById("btnMulaSaringan");
+            const originalBtnHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...`;
+
+            const unlockBtn = () => {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+            };
+
+            const fasiliti = document.getElementById('fasiliti').value;
+            const nama = document.getElementById('nama').value;
+            const ic = document.getElementById('ic').value;
+            const telefon = document.getElementById('telefon').value;
+            const umur = document.getElementById('umur').value;
+            const jantina = document.getElementById('jantina').value;
+            const komorbid = document.getElementById('komorbidValidator').value; 
+            const alamat = document.getElementById('alamat').value; 
+            const isBangsaValid = document.getElementById('bangsaSelect').value !== "" && 
+                                  (document.getElementById('bangsaSelect').value !== "Lain-lain" || document.getElementById('bangsaLain').value.trim() !== "");
+
+            if (!fasiliti || !nama || !ic || !telefon || !umur || !jantina || !komorbid || !alamat || !isBangsaValid) {
+                showCustomAlert("Sila lengkapkan semua data demografi.", "Maklumat Tidak Lengkap"); 
+                return unlockBtn();
+            }
+
+            if (!document.getElementById('icError').classList.contains('hidden')) {
+                showCustomAlert("Sila betulkan format No. KP / Passport anda.", "Format Tidak Sah");
+                return unlockBtn();
+            }
+
+            if (parseInt(umur) <= 12) {
+                showCustomAlert("Saringan ini dikhaskan untuk 13 tahun ke atas.", "Had Umur");
+                document.getElementById('umur').classList.remove('bg-gray-100');
+                document.getElementById('umur').classList.add('border-red-500', 'bg-white');
+                return unlockBtn();
+            }
+
+            unlockBtn(); 
+            document.getElementById('sectionA').classList.replace('visible-section', 'hidden-section');
+            document.getElementById('sectionScreening').classList.replace('hidden-section', 'visible-section');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goBackToDemografi() {
+            document.getElementById('sectionScreening').classList.replace('visible-section', 'hidden-section');
+            document.getElementById('sectionA').classList.replace('hidden-section', 'visible-section');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goBackToAwal() {
+            document.getElementById('partLanjut').classList.add('hidden');
+            document.getElementById('partAwal').classList.remove('hidden');
+            state.needsPHQ9 = false;
+            state.needsGAD7 = false;
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        function renderQ(qArray, containerId, prefix) {
+            let html = '';
+            qArray.forEach((item, i) => {
+                if (typeof item === 'object') {
+                    if (item.spacerTitle) {
+                        html += `<div class="flex items-center py-4">
+                                    <div class="flex-grow border-t-2 border-dashed border-teal-200"></div>
+                                    <span class="flex-shrink-0 mx-4 text-teal-600 font-bold text-sm bg-teal-50 px-3 py-1 rounded-full">${item.spacerTitle}</span>
+                                    <div class="flex-grow border-t-2 border-dashed border-teal-200"></div>
+                                 </div>`;
+                    }
+                    if (item.instruction) {
+                        html += `<div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded-lg">
+                                    <p class="font-bold text-blue-900">Arahan:</p>
+                                    <p class="text-sm text-blue-800 mt-1">${item.instruction}</p>
+                                 </div>`;
+                    }
+                }
+                const qText = typeof item === 'object' ? item.q : `${i+1}. ${item}`;
+                const opts = typeof item === 'object' ? item.opts : ['🟢 Tiada (0)', '🟡 Beberapa Hari (1)', '🟠 Lebih Seminggu (2)', '🔴 Setiap Hari (3)'];
+                const gridClass = opts.length === 2 ? "grid grid-cols-2 gap-4 max-w-sm mx-auto mt-4" : "grid grid-cols-2 md:grid-cols-4 gap-2 mt-4";
+                
+                html += `<div class="bg-gray-50 p-4 md:p-6 rounded-lg border mb-4">
+                            <p class="font-semibold text-gray-800 leading-snug">${qText}</p>
+                            <div class="${gridClass}">`;
+                
+                opts.forEach((opt, v) => {
+                    html += `<div>
+                                <input type="radio" name="${prefix}_${i}" id="${prefix}_${i}_${v}" value="${v}" class="hidden emoji-radio">
+                                <label for="${prefix}_${i}_${v}" class="block h-full border rounded p-3 text-center cursor-pointer text-sm font-medium flex items-center justify-center transition-all duration-200 hover:bg-teal-50">${opt}</label>
+                             </div>`;
+                });
+                html += `   </div></div>`;
+            });
+            document.getElementById(containerId).innerHTML = html;
+        }
+
+        function evalAwal() {
+            state.whooleyAnswers = getAns('awal', 2);
+            state.gad2Answers = getAns('awal', 2, 2); 
+            
+            if(state.whooleyAnswers.includes(NaN) || state.gad2Answers.includes(NaN)) { 
+                showCustomAlert("Sila jawab semua soalan Whooley dan GAD-2.", "Soalan Belum Lengkap"); 
+                return; 
+            }
+            
+            state.needsPHQ9 = state.whooleyAnswers.some(v => v > 0);
+            state.needsGAD7 = (state.gad2Answers[0] + state.gad2Answers[1]) >= 3;
+
+            if(state.needsPHQ9 || state.needsGAD7) {
+                let html = ''; 
+                const blueBoxTemplate = `
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded-lg">
+                        <p class="font-bold text-blue-900">Arahan:</p>
+                        <p class="text-sm text-blue-800 mt-1">Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-red-600 bg-red-100 px-2 rounded">2 MINGGU LEPAS</span>.</p>
+                    </div>`;
+                            
+                if(state.needsPHQ9) { 
+                    html += `<div class="flex items-center pb-4 pt-2">
+                                <div class="flex-grow border-t-2 border-dashed border-teal-200"></div>
+                                <span class="flex-shrink-0 mx-4 text-teal-600 font-bold text-sm bg-teal-50 px-3 py-1 rounded-full">Saringan PHQ-9</span>
+                                <div class="flex-grow border-t-2 border-dashed border-teal-200"></div>
+                             </div>
+                             ${blueBoxTemplate}
+                             <div id="phqBox"></div>`; 
+                }
+                if(state.needsGAD7) {
+                    html += `<div class="flex items-center pb-4 pt-6">
+                                <div class="flex-grow border-t-2 border-dashed border-teal-200"></div>
+                                <span class="flex-shrink-0 mx-4 text-teal-600 font-bold text-sm bg-teal-50 px-3 py-1 rounded-full">Saringan GAD-7 (Lanjutan)</span>
+                                <div class="flex-grow border-t-2 border-dashed border-teal-200"></div>
+                             </div>
+                             ${blueBoxTemplate}
+                             <div id="gadBox"></div>`; 
+                }
+                
+                document.getElementById('lanjutContainer').innerHTML = html;
+                if(state.needsPHQ9) renderQ(qPHQ9, 'phqBox', 'phq');
+                if(state.needsGAD7) renderQ(qGAD5_Lanjut, 'gadBox', 'gad');
+                
+                document.getElementById('partAwal').classList.add('hidden');
+                document.getElementById('partLanjut').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                submitFinal(); 
+            }
+        }
+
+        function getAns(prefix, count, offset=0) {
+            let arr = [];
+            for(let i=0; i<count; i++) {
+                const el = document.querySelector(`input[name="${prefix}_${i+offset}"]:checked`);
+                arr.push(el ? parseInt(el.value) : NaN);
+            }
+            return arr;
+        }
+
+        let isSubmittingData = false;
+
+        // --- SUBMIT VIA POST FETCH API ---
+        function submitFinal() {
+            if (isSubmittingData) return; 
+            isSubmittingData = true;
+
+            if(state.needsPHQ9) state.phq9Answers = getAns('phq', 9);
+            if(state.needsGAD7) state.gad7Answers = [...state.gad2Answers, ...getAns('gad', 5)]; 
+
+            if ((state.needsPHQ9 && state.phq9Answers.includes(NaN)) || 
+                (state.needsGAD7 && state.gad7Answers.includes(NaN))) { 
+                showCustomAlert("Sila lengkapkan semua soalan saringan lanjut.", "Soalan Belum Lengkap"); 
+                isSubmittingData = false; 
+                return; 
+            }
+
+            document.getElementById('actionButtonsLanjut').classList.add('hidden');
+            document.getElementById('loadingSubmit').classList.remove('hidden');
+
+            const pScore = state.phq9Answers.reduce((a,b)=>a+b, 0);
+            const gScore = state.gad7Answers.reduce((a,b)=>a+b, 0);
+            state.suicideRisk = state.phq9Answers[8] > 0; 
+
+            const payload = {
+                submissionToken: document.getElementById('ic').value.replace(/[^A-Za-z0-9]/g, ""), 
+                daerah: document.getElementById('daerah').value,
+                fasiliti: document.getElementById('fasiliti').value,
+                kategori: document.querySelector('input[name="kategori"]:checked').value,
+                nama: document.getElementById('nama').value,
+                jantina: document.getElementById('jantina').value || document.getElementById('jantina').options[document.getElementById('jantina').selectedIndex].text,
+                umur: document.getElementById('umur').value,
+                ic: document.getElementById('ic').value,
+                telefon: document.getElementById('telefon').value,
+                bangsa: document.getElementById('bangsaSelect').value === 'Lain-lain' ? document.getElementById('bangsaLain').value : document.getElementById('bangsaSelect').value,
+                penyakit: Array.from(document.querySelectorAll('.komorbid-cb:checked')).map(cb => cb.value === 'Lain-lain' ? document.getElementById('komorbidLain').value : cb.value).join(", "),
+                warganegara: document.getElementById('warganegara').value,
+                alamat: document.getElementById('alamat').value,
+                email: document.getElementById('email').value,
+
+                wAnswers: state.whooleyAnswers.length ? state.whooleyAnswers : [0,0],
+                whooleyStatus: state.needsPHQ9 ? "Positif" : "Negatif",
+                
+                g2Answers: state.gad2Answers.length ? state.gad2Answers : [0,0],
+                gad2Status: state.needsGAD7 ? "Positif" : "Negatif",
+                
+                phq9Answers: state.phq9Answers.length ? state.phq9Answers : Array(9).fill(""),
+                phq9Score: state.needsPHQ9 ? pScore : "",
+                phq9Level: state.needsPHQ9 ? getLevel(pScore, 'p', state.suicideRisk) : "",
+
+                gad7Answers: state.gad7Answers.length ? state.gad7Answers : Array(7).fill(""),
+                gad7Score: state.needsGAD7 ? gScore : "",
+                gad7Level: state.needsGAD7 ? getLevel(gScore, 'g', false) : "",
+                
+                suicideRisk: state.suicideRisk
+            };
+
+            fetch(GAS_API_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                isSubmittingData = false;
+                if (data.success) {
+                    showResultUI(data);
+                } else {
+                    showCustomAlert("Ralat menyimpan data: " + data.error, "Ralat Sistem");
+                    document.getElementById('actionButtonsLanjut').classList.remove('hidden');
+                    document.getElementById('loadingSubmit').classList.add('hidden');
+                }
+            })
+            .catch(err => {
+                isSubmittingData = false;
+                showCustomAlert("Masalah rangkaian (Network Error). Sila cuba lagi.", "Ralat Sistem");
+                document.getElementById('actionButtonsLanjut').classList.remove('hidden');
+                document.getElementById('loadingSubmit').classList.add('hidden');
+            });
+        }
+
+        function getLevel(score, type, risk) {
+            if(risk) return "BERISIKO KECEMASAN";
+            if(score <= 4) return "Normal";
+            if(score <= 9) return "Ringan";
+            if(score <= 14) return "Sederhana";
+            if(score <= 19 && type==='p') return "Teruk";
+            if(score >= 15 && type==='g') return "Teruk";
+            return "Sangat Teruk";
+        }
+
+        function showResultUI(res) {
+            document.getElementById('sectionScreening').classList.replace('visible-section', 'hidden-section');
+            document.getElementById('sectionResult').classList.replace('hidden-section', 'visible-section');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            let html = `<p class="text-xl text-green-600 font-bold mb-4">Terima Kasih, maklumat telah direkodkan ke ${document.getElementById('fasiliti').value}.</p>`;
+            
+            if(state.suicideRisk || state.needsPHQ9 || state.needsGAD7) {
+                document.getElementById('riskAlert').classList.remove('hidden');
+            } else {
+                html += `<div class="bg-green-50 p-6 rounded-lg text-green-800 text-center">
+                            <i class="fas fa-smile text-4xl mb-3 block"></i>
+                            <p>Status Kesihatan Mental anda memuaskan. Teruskan gaya hidup sihat!</p>
+                         </div>`;
+            }
+
+            const today = new Date();
+            const day = String(today.getDate()).padStart(2, '0');
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            let hours = today.getHours();
+            const minutes = String(today.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; 
+            const tarikhTimestamp = `${day}/${month}/${year}, ${hours}:${minutes} ${ampm}`;
+            
+            const whooleyText = state.needsPHQ9 ? `<span class="text-red-600 font-bold">Berisiko</span>` : `<span class="text-green-600 font-bold">Tidak Berisiko</span>`;
+            const gadText = state.needsGAD7 ? `<span class="text-red-600 font-bold">Berisiko</span>` : `<span class="text-green-600 font-bold">Tidak Berisiko</span>`;
+            
+            let summaryHtml = `
+                <div class="mt-8 border-t pt-4">
+                    <button onclick="toggleSummary()" class="text-teal-700 hover:text-teal-900 font-semibold text-sm underline flex items-center justify-center w-full transition-colors">
+                        <i class="fas fa-notes-medical mr-2"></i> Papar Ringkasan Klinikal (Kakitangan)
+                    </button>
+                    <div id="clinicalSummaryBox" class="hidden mt-4 bg-gray-50 border border-gray-200 rounded-xl p-5 text-left text-sm text-gray-800 shadow-inner">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 border-b pb-4">
+                            <p><span class="text-gray-500 text-xs block uppercase tracking-wider">Nama</span><span class="font-bold uppercase">${document.getElementById('nama').value}</span></p>
+                            <p><span class="text-gray-500 text-xs block uppercase tracking-wider">No. KP / Passport</span><span class="font-bold">${document.getElementById('ic').value}</span></p>
+                            <p><span class="text-gray-500 text-xs block uppercase tracking-wider">No. Telefon</span><span class="font-bold">${document.getElementById('telefon').value}</span></p>
+                            <p><span class="text-gray-500 text-xs block uppercase tracking-wider">Tarikh Saringan</span><span class="font-bold">${tarikhTimestamp}</span></p>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="flex justify-between border-b border-dashed border-gray-300 pb-1"><span>Saringan Whooley:</span> ${whooleyText}</p>
+                            <p class="flex justify-between border-b border-dashed border-gray-300 pb-1"><span>Saringan GAD-2:</span> ${gadText}</p>
+            `;
+
+            if (state.needsPHQ9) {
+                const pScore = state.phq9Answers.reduce((a,b)=>a+b, 0);
+                const phqSequenceStr = state.phq9Answers.map((ans, idx) => idx === 8 && ans > 0 ? `<span class="font-black text-red-900 text-sm bg-red-300 px-1.5 py-0.5 rounded shadow-sm">${ans}</span>` : ans).join(', ');
+                summaryHtml += `
+                            <div class="bg-red-50 border border-red-100 p-3 rounded-lg mt-3">
+                                <p class="flex justify-between font-bold text-red-800 text-base border-b border-red-200 pb-1 mb-1"><span>Skor PHQ-9:</span> <span>${pScore}</span></p>
+                                <p class="text-xs text-red-600 leading-relaxed"><span class="font-semibold">Siri Jawapan:</span> ${phqSequenceStr}</p>
+                            </div>`;
+            }
+
+            if (state.needsGAD7) {
+                const gScore = state.gad7Answers.reduce((a,b)=>a+b, 0);
+                summaryHtml += `
+                            <div class="bg-orange-50 border border-orange-100 p-3 rounded-lg mt-3">
+                                <p class="flex justify-between font-bold text-orange-800 text-base border-b border-orange-200 pb-1 mb-1"><span>Skor GAD-7:</span> <span>${gScore}</span></p>
+                                <p class="text-xs text-orange-600"><span class="font-semibold">Siri Jawapan:</span> ${state.gad7Answers.join(', ')}</p>
+                            </div>`;
+            }
+
+            summaryHtml += `</div></div></div>`;
+            document.getElementById('resultContent').innerHTML = html + summaryHtml;
+        }
+
+        function toggleSummary() {
+            const box = document.getElementById('clinicalSummaryBox');
+            box.classList.toggle('hidden');
+        }
+
+        function showCustomAlert(message, title = "Perhatian", isSuccess = false) {
+            document.getElementById('customAlertTitle').innerText = title;
+            document.getElementById('customAlertMessage').innerText = message;
+            
+            const iconBg = document.getElementById('alertIconBg');
+            const icon = document.getElementById('alertIcon');
+            
+            if (isSuccess) {
+                iconBg.className = "mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4";
+                icon.className = "fas fa-check text-green-500 text-2xl";
+            } else {
+                iconBg.className = "mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4";
+                icon.className = "fas fa-exclamation-triangle text-red-500 text-2xl";
+            }
+
+            const alertBox = document.getElementById('customAlertBox');
+            const alertContent = document.getElementById('customAlertContent');
+            
+            alertBox.classList.remove('hidden');
+            alertBox.classList.add('flex');
+            
+            setTimeout(() => {
+                alertContent.classList.remove('scale-95', 'opacity-0');
+                alertContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeCustomAlert() {
+            const alertBox = document.getElementById('customAlertBox');
+            const alertContent = document.getElementById('customAlertContent');
+            
+            alertContent.classList.remove('scale-100', 'opacity-100');
+            alertContent.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                alertBox.classList.add('hidden');
+                alertBox.classList.remove('flex');
+            }, 200); 
+        }
+    </script>
+</body>
+</html>
