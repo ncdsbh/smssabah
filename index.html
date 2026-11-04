@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ms">
-<!-- [Head, CSS, and Body elements remain identical to your previous version] -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         body { font-family: 'Nunito', sans-serif; background: linear-gradient(225deg, #fce7f3 0%, #d1fae5 100%); min-height: 100vh; }
         .card-shadow { box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
@@ -15,6 +15,7 @@
         .hidden-section { display: none; }
         .visible-section { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Loader */
         .loader { border: 4px solid #f3f3f3; border-top: 4px solid #0d9488; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -22,15 +23,15 @@
 <body class="text-gray-700">
 
     <header class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex items-center justify-center">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-center relative">
             <div class="flex flex-col items-center space-y-2 text-center">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/26/Coat_of_arms_of_Malaysia.svg" class="h-14 w-auto" alt="Jata Negara Malaysia">
                 <div>
-                    <h1 class="text-lg md:text-xl font-bold text-teal-700 leading-tight">Saringan Minda Sihat</h1>
-                    <p class="text-xs text-gray-600 mt-0.5">Jabatan Kesihatan Negeri Sabah</p>
+                    <h1 class="text-lg md:text-xl font-bold text-teal-700 leading-tight trans" data-ms="Saringan Minda Sihat" data-en="Mental Health Screening">Saringan Minda Sihat</h1>
+                    <p class="text-xs text-gray-600 mt-0.5 trans" data-ms="Jabatan Kesihatan Negeri Sabah" data-en="Sabah State Health Department">Jabatan Kesihatan Negeri Sabah</p>
                 </div>
             </div>
-
+            <!-- Dwi Bahasa Button -->
             <button onclick="toggleLanguage()" id="langBtn" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-teal-100 hover:bg-teal-200 text-teal-800 border border-teal-300 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition">
                 <i class="fas fa-language mr-1"></i> <span id="langText">EN</span>
             </button>
@@ -38,99 +39,100 @@
     </header>
 
     <main class="container mx-auto px-4 py-8 max-w-4xl">
+
         <div id="sectionA" class="visible-section bg-white rounded-2xl card-shadow p-6 md:p-8">
-            <h2 class="text-2xl font-bold text-teal-800 mb-6 border-b pb-2">Maklumat Saringan</h2>
+            <h2 class="text-2xl font-bold text-teal-800 mb-6 border-b pb-2 trans" data-ms="Maklumat Saringan" data-en="Screening Information">Maklumat Saringan</h2>
             
             <form id="formDemographics" class="space-y-6">
                 <div class="bg-teal-50 p-4 rounded-xl border border-teal-100">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="font-bold text-teal-800">Pemilihan Fasiliti</h3>
+                        <h3 class="font-bold text-teal-800 trans" data-ms="Pemilihan Fasiliti" data-en="Facility Selection">Pemilihan Fasiliti</h3>
                         <div class="flex space-x-2">
-                            <button type="button" id="btnRefreshCache" onclick="refreshCache()" class="text-xs bg-white border border-teal-300 hover:bg-teal-50 text-teal-700 px-3 py-1.5 rounded flex items-center transition shadow-sm" title="Muat turun senarai fasiliti terkini">
+                            <button type="button" id="btnRefreshCache" onclick="refreshCache()" class="text-xs bg-white border border-teal-300 hover:bg-teal-50 text-teal-700 px-3 py-1.5 rounded flex items-center transition shadow-sm">
                                 <i id="refreshIcon" class="fas fa-sync-alt mr-1"></i> 
-                                <span class="hidden sm:inline">Refresh Data</span>
+                                <span class="hidden sm:inline trans" data-ms="Muat Semula" data-en="Refresh Data">Muat Semula</span>
                             </button>
                             <button type="button" id="btnGps" onclick="getLocation()" disabled class="text-xs bg-gray-400 cursor-not-allowed text-white px-3 py-1.5 rounded flex items-center transition">
                                 <i id="gpsIcon" class="fas fa-spinner fa-spin mr-1"></i> 
-                                <span id="gpsText">Sedia GPS...</span>
+                                <span id="gpsText" class="trans" data-ms="Sedia GPS..." data-en="Ready GPS...">Sedia GPS...</span>
                             </button>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold mb-1">Daerah</label>
+                            <label class="block text-sm font-semibold mb-1 trans" data-ms="Daerah" data-en="District">Daerah</label>
                             <select id="daerah" onchange="updateFasiliti()" class="w-full px-4 py-2 rounded-lg border outline-none bg-white" required>
-                                <option value="">Memuatkan data...</option>
+                                <option value="" class="trans" data-ms="Memuatkan data..." data-en="Loading data...">Memuatkan data...</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold mb-1">Klinik / Fasiliti<span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-semibold mb-1 trans" data-ms="Klinik / Fasiliti<span class='text-red-500'>*</span>" data-en="Clinic / Facility<span class='text-red-500'>*</span>">Klinik / Fasiliti<span class="text-red-500">*</span></label>
                             <select id="fasiliti" class="w-full px-4 py-2 rounded-lg border outline-none bg-white" disabled required>
-                                <option value="">Pilih Daerah dahulu</option>
+                                <option value="" class="trans" data-ms="Pilih Daerah dahulu" data-en="Select District first">Pilih Daerah dahulu</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold mb-2">Kategori Saringan</label>
+                    <label class="block text-sm font-semibold mb-2 trans" data-ms="Kategori Saringan" data-en="Screening Category">Kategori Saringan</label>
                     <div class="flex space-x-4">
                         <label class="flex items-center space-x-2">
                             <input type="radio" name="kategori" value="Saringan Awam" onchange="toggleAlamat()" checked class="text-teal-600">
-                            <span>Saringan Awam</span>
+                            <span class="trans" data-ms="Saringan Awam" data-en="Public Screening">Saringan Awam</span>
                         </label>
                         <label class="flex items-center space-x-2">
                             <input type="radio" name="kategori" value="Kakitangan Kesihatan" onchange="toggleAlamat()" class="text-teal-600">
-                            <span>Kakitangan Kesihatan</span>
+                            <span class="trans" data-ms="Kakitangan Kesihatan" data-en="Healthcare Worker">Kakitangan Kesihatan</span>
                         </label>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold mb-1">Nama Penuh<span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1 trans" data-ms="Nama Penuh<span class='text-red-500'>*</span>" data-en="Full Name<span class='text-red-500'>*</span>">Nama Penuh<span class="text-red-500">*</span></label>
                         <input type="text" id="nama" class="w-full px-4 py-2 rounded-lg border outline-none uppercase" required>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Warganegara</label>
+                        <label class="block text-sm font-semibold mb-1 trans" data-ms="Warganegara" data-en="Nationality">Warganegara</label>
                         <select id="warganegara" onchange="handleWarganegara()" class="w-full px-4 py-2 rounded-lg border outline-none">
-                            <option value="Warganegara">Warganegara Malaysia</option>
-                            <option value="Bukan Warganegara">Bukan Warganegara</option>
+                            <option value="Warganegara" class="trans" data-ms="Warganegara Malaysia" data-en="Malaysian Citizen">Warganegara Malaysia</option>
+                            <option value="Bukan Warganegara" class="trans" data-ms="Bukan Warganegara" data-en="Non-Citizen">Bukan Warganegara</option>
                         </select>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-semibold mb-1">No. KP / Passport<span class="text-red-500">*</span></label>
-                        <input type="text" id="ic" oninput="extractIC()" class="w-full px-4 py-2 rounded-lg border outline-none" required placeholder="Contoh: 801231125678">
-                        <p id="icError" class="text-xs text-red-500 mt-1 hidden">Format IC tidak sah (12 digit sahaja).</p>
+                        <label class="block text-sm font-semibold mb-1 trans" data-ms="No. KP / Passport<span class='text-red-500'>*</span>" data-en="IC / Passport No.<span class='text-red-500'>*</span>">No. KP / Passport<span class="text-red-500">*</span></label>
+                        <input type="text" id="ic" oninput="extractIC()" class="w-full px-4 py-2 rounded-lg border outline-none trans-placeholder" data-ms-placeholder="Contoh: 801231125678" data-en-placeholder="Example: 801231125678" required placeholder="Contoh: 801231125678">
+                        <p id="icError" class="text-xs text-red-500 mt-1 hidden trans" data-ms="Format IC tidak sah (12 digit sahaja)." data-en="Invalid IC format (12 digits only).">Format IC tidak sah (12 digit sahaja).</p>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Umur<span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1 trans" data-ms="Umur<span class='text-red-500'>*</span>" data-en="Age<span class='text-red-500'>*</span>">Umur<span class="text-red-500">*</span></label>
                         <input type="number" id="umur" class="w-full px-4 py-2 rounded-lg border bg-gray-100" required>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Jantina<span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1 trans" data-ms="Jantina<span class='text-red-500'>*</span>" data-en="Gender<span class='text-red-500'>*</span>">Jantina<span class="text-red-500">*</span></label>
                         <select id="jantina" class="w-full px-4 py-2 rounded-lg border bg-gray-100" required>
                             <option value="">-</option>
-                            <option value="Lelaki">Lelaki</option>
-                            <option value="Perempuan">Perempuan</option>
+                            <option value="Lelaki" class="trans" data-ms="Lelaki" data-en="Male">Lelaki</option>
+                            <option value="Perempuan" class="trans" data-ms="Perempuan" data-en="Female">Perempuan</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold mb-1">No. Telefon<span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1 trans" data-ms="No. Telefon<span class='text-red-500'>*</span>" data-en="Phone Number<span class='text-red-500'>*</span>">No. Telefon<span class="text-red-500">*</span></label>
                         <input type="tel" id="telefon" class="w-full px-4 py-2 rounded-lg border outline-none" required>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold mb-1">Bangsa / Etnik<span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-semibold mb-1 trans" data-ms="Bangsa / Etnik<span class='text-red-500'>*</span>" data-en="Race / Ethnicity<span class='text-red-500'>*</span>">Bangsa / Etnik<span class="text-red-500">*</span></label>
                         <select id="bangsaSelect" onchange="toggleBangsaLain()" class="w-full px-4 py-2 rounded-lg border outline-none bg-white" required>
-                            <option value="">Memuatkan data...</option>
+                            <option value="" class="trans" data-ms="Memuatkan data..." data-en="Loading data...">Memuatkan data...</option>
                         </select>
-                        <input type="text" id="bangsaLain" class="w-full px-4 py-2 rounded-lg border outline-none mt-2 hidden" placeholder="Sila nyatakan bangsa anda">
+                        <input type="text" id="bangsaLain" class="w-full px-4 py-2 rounded-lg border outline-none mt-2 hidden trans-placeholder" data-ms-placeholder="Sila nyatakan bangsa anda" data-en-placeholder="Please specify your race" placeholder="Sila nyatakan bangsa anda">
                     </div>
 
                     <div class="md:col-span-2">
@@ -141,38 +143,40 @@
                     <div class="md:col-span-2 relative">
                         <input type="text" id="komorbidValidator" class="absolute top-12 left-1/2 transform -translate-x-1/2 w-1 h-1 opacity-0 pointer-events-none" required tabindex="-1">
                         
-                        <label class="block text-sm font-semibold mb-2">Sejarah Penyakit Peribadi (Komorbid)<span class="text-red-500">*</span></label>
-                        <p class="text-xs italic text-gray-500 mb-3">Yang memerlukan janji temu atau rawatan berterusan di fasiliti kesihatan<span class="text-red-500">*</span></p>
+                        <label class="block text-sm font-semibold mb-2 trans" data-ms="Sejarah Penyakit Peribadi (Komorbid)<span class='text-red-500'>*</span>" data-en="Personal Medical History (Comorbid)<span class='text-red-500'>*</span>">Sejarah Penyakit Peribadi (Komorbid)<span class="text-red-500">*</span></label>
+                        <p class="text-xs italic text-gray-500 mb-3 trans" data-ms="Yang memerlukan janji temu atau rawatan berterusan di fasiliti kesihatan<span class='text-red-500'>*</span>" data-en="Requiring ongoing treatment or appointments at a health facility<span class='text-red-500'>*</span>">Yang memerlukan janji temu atau rawatan berterusan di fasiliti kesihatan<span class="text-red-500">*</span></p>
                         
                         <div id="komorbidContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white p-4 rounded-lg border shadow-sm">
-                            <span class="text-gray-500 text-sm">Memuatkan data...</span>
+                            <span class="text-gray-500 text-sm trans" data-ms="Memuatkan data..." data-en="Loading data...">Memuatkan data...</span>
                         </div>
                         
-                        <input type="text" id="komorbidLain" class="w-full px-4 py-2 rounded-lg border outline-none mt-2 hidden" placeholder="Sila nyatakan penyakit lain (pisahkan dengan koma)">
+                        <input type="text" id="komorbidLain" class="w-full px-4 py-2 rounded-lg border outline-none mt-2 hidden trans-placeholder" data-ms-placeholder="Sila nyatakan penyakit lain (pisahkan dengan koma)" data-en-placeholder="Please specify other illness (separated by comma)" placeholder="Sila nyatakan penyakit lain (pisahkan dengan koma)">
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-sm font-semibold mb-1">Email (Sekiranya perlu)</label>
+                        <label class="block text-sm font-semibold mb-1 trans" data-ms="Email (Sekiranya perlu)" data-en="Email (Optional)">Email (Sekiranya perlu)</label>
                         <input type="email" id="email" class="w-full px-4 py-2 rounded-lg border outline-none">
                     </div>
                 </div>
 
                 <div class="pt-6 text-center">
-                    <button type="button" id="btnMulaSaringan" onclick="startScreening()" class="bg-teal-600 text-white font-bold py-3 px-8 rounded-full shadow hover:bg-teal-700 transition">Mula Saringan <i class="fas fa-arrow-right ml-2"></i></button>
+                    <button type="button" id="btnMulaSaringan" onclick="startScreening()" class="bg-teal-600 text-white font-bold py-3 px-8 rounded-full shadow hover:bg-teal-700 transition">
+                        <span class="trans" data-ms="Mula Saringan" data-en="Start Screening">Mula Saringan</span> <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
                 </div>
             </form>
         </div>
 
         <div id="sectionScreening" class="hidden-section bg-white rounded-2xl card-shadow p-6 md:p-8">
-            <h2 class="text-2xl font-bold text-teal-700 mb-6 border-b pb-2">Soalan Saringan</h2>
+            <h2 class="text-2xl font-bold text-teal-700 mb-6 border-b pb-2 trans" data-ms="Soalan Saringan" data-en="Screening Questions">Soalan Saringan</h2>
             
             <div id="partAwal">
-                <h3 class="font-bold text-lg text-indigo-700 mb-2">Bahagian 1: Whooley & GAD-2</h3>
+                <h3 class="font-bold text-lg text-indigo-700 mb-2 trans" data-ms="Bahagian 1: Whooley & GAD-2" data-en="Part 1: Whooley & GAD-2">Bahagian 1: Whooley & GAD-2</h3>
                 <div id="awalContainer" class="space-y-4 mb-6"></div>
                 
                 <div class="flex items-center justify-between mt-6">
-                    <button type="button" onclick="goBackToDemografi()" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-full font-bold transition"><i class="fas fa-arrow-left mr-2"></i> Kembali</button>
-                    <button type="button" onclick="evalAwal()" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded-full font-bold transition">Seterusnya <i class="fas fa-arrow-right ml-2"></i></button>
+                    <button type="button" onclick="goBackToDemografi()" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-full font-bold transition"><i class="fas fa-arrow-left mr-2"></i> <span class="trans" data-ms="Kembali" data-en="Back">Kembali</span></button>
+                    <button type="button" onclick="evalAwal()" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded-full font-bold transition"><span class="trans" data-ms="Seterusnya" data-en="Next">Seterusnya</span> <i class="fas fa-arrow-right ml-2"></i></button>
                 </div>
             </div>
 
@@ -181,27 +185,27 @@
                 
                 <div id="loadingSubmit" class="hidden flex items-center justify-center space-x-3 my-4">
                     <div class="loader"></div>
-                    <span class="text-teal-700 font-bold">Menghantar Data... Sila Tunggu.</span>
+                    <span class="text-teal-700 font-bold trans" data-ms="Menghantar Data... Sila Tunggu." data-en="Submitting Data... Please Wait.">Menghantar Data... Sila Tunggu.</span>
                 </div>
 
                 <div class="flex items-center justify-between mt-6" id="actionButtonsLanjut">
-                    <button type="button" onclick="goBackToAwal()" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-full font-bold transition"><i class="fas fa-arrow-left mr-2"></i> Kembali</button>
-                    <button type="button" id="btnSubmitFinal" onclick="submitFinal()" class="bg-teal-600 hover:bg-teal-700 text-white py-2 px-6 rounded-full font-bold transition">Simpan & Lihat Keputusan</button>
+                    <button type="button" onclick="goBackToAwal()" class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-6 rounded-full font-bold transition"><i class="fas fa-arrow-left mr-2"></i> <span class="trans" data-ms="Kembali" data-en="Back">Kembali</span></button>
+                    <button type="button" id="btnSubmitFinal" onclick="submitFinal()" class="bg-teal-600 hover:bg-teal-700 text-white py-2 px-6 rounded-full font-bold transition"><span class="trans" data-ms="Simpan & Lihat Keputusan" data-en="Save & View Results">Simpan & Lihat Keputusan</span></button>
                 </div>
             </div>
         </div>
 
         <div id="sectionResult" class="hidden-section bg-white rounded-2xl card-shadow p-6 md:p-8 text-center">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6">Keputusan Saringan</h2>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 trans" data-ms="Keputusan Saringan" data-en="Screening Results">Keputusan Saringan</h2>
             <div id="resultContent" class="space-y-4 text-center"></div>
             
             <div id="riskAlert" class="hidden mt-6 bg-red-50 border-l-4 border-red-500 p-6 rounded-lg text-center">
                 <i class="fas fa-heart text-red-500 text-4xl mb-3 animate-pulse"></i>
-                <h3 class="text-xl font-bold text-red-800">Hubungi Talian HEAL: <a href="tel:15555" class="underline hover:text-red-600 transition-colors">15555</a></h3>
-                <p>Sila berjumpa dengan kakitangan di fasiliti saringan anda ATAU dapatkan temujanji di fasiliti kesihatan terdekat.</p>
+                <h3 class="text-xl font-bold text-red-800 trans" data-ms="Hubungi Talian HEAL: <a href='tel:15555' class='underline hover:text-red-600 transition-colors'>15555</a>" data-en="Contact HEAL Hotline: <a href='tel:15555' class='underline hover:text-red-600 transition-colors'>15555</a>">Hubungi Talian HEAL: <a href="tel:15555" class="underline hover:text-red-600 transition-colors">15555</a></h3>
+                <p class="trans" data-ms="Sila berjumpa dengan kakitangan di fasiliti saringan anda ATAU dapatkan temujanji di fasiliti kesihatan terdekat." data-en="Please see a staff member at your screening facility OR get an appointment at the nearest health clinic.">Sila berjumpa dengan kakitangan di fasiliti saringan anda ATAU dapatkan temujanji di fasiliti kesihatan terdekat.</p>
             </div>
 
-            <button onclick="window.location.reload()" class="mt-8 bg-gray-500 text-white py-2 px-6 rounded-full font-bold">Saringan Baru</button>
+            <button onclick="window.location.reload()" class="mt-8 bg-gray-500 text-white py-2 px-6 rounded-full font-bold trans" data-ms="Saringan Baru" data-en="New Screening">Saringan Baru</button>
         </div>
 
         <!-- CUSTOM ALERT MODAL -->
@@ -212,8 +216,8 @@
                 </div>
                 <h3 class="text-xl font-bold text-gray-900 mb-2" id="customAlertTitle">Perhatian</h3>
                 <p class="text-gray-600 mb-6" id="customAlertMessage">Mesej di sini</p>
-                <button onclick="closeCustomAlert()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl transition-colors">
-                    Faham
+                <button onclick="closeCustomAlert()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl transition-colors trans" data-ms="Tutup" data-en="Close">
+                    Tutup
                 </button>
             </div>
         </div>
@@ -223,7 +227,7 @@
         // ==========================================================
         // 🔴 PASTE YOUR NEW GOOGLE APPS SCRIPT WEB APP URL HERE:
         // ==========================================================
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyamsXGXxZ9aeoxU8LXtjyHXJuKV9_-uuyDXXVwAlz_2pTIoL_J_yCwC-IRP38lYkHt9g/exec";
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbycYOUR_SCRIPT_ID_HERE/exec";
         
         let masterClinics = [];
         let state = {
@@ -231,23 +235,20 @@
             needsPHQ9: false, needsGAD7: false, suicideRisk: false
         };
 
-        let currentLang = 'ms'; // Global state
+        let currentLang = 'ms'; 
 
         const qAwal = [
             { 
                 type: 'w', 
                 instruction: {
                     ms: 'Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-blue-600 bg-blue-100 px-2 rounded uppercase">1 Bulan Lepas</span>.',
-                    en: 'Over the <span class="font-extrabold text-blue-600 bg-blue-100 px-2 rounded uppercase">PAST 1 MONTH</span>, have you been bothered by the following problems?'
+                    en: 'Over the past one month, have you been bothered by the following problems?'
                 },
                 q: {
                     ms: '1. <span class="text-blue-600 font-bold">(SEBULAN LEPAS)</span> Adakah anda merasa murung, sedih atau tiada harapan?',
                     en: '1. <span class="text-blue-600 font-bold">(PAST 1 MONTH)</span> Feeling down, depressed or hopeless?'
                 }, 
-                opts: {
-                    ms: ['🟢 Tidak (0)', '🔴 Ya (1)'],
-                    en: ['🟢 No (0)', '🔴 Yes (1)']
-                }
+                opts: { ms: ['🟢 Tidak (0)', '🔴 Ya (1)'], en: ['🟢 No (0)', '🔴 Yes (1)'] }
             },
             { 
                 type: 'w', 
@@ -255,17 +256,14 @@
                     ms: '2. <span class="text-blue-600 font-bold">(SEBULAN LEPAS)</span> Adakah anda kurang minat/keseronokan melakukan kerja?',
                     en: '2. <span class="text-blue-600 font-bold">(PAST 1 MONTH)</span> Having little interest or pleasure in doing things?'
                 }, 
-                opts: {
-                    ms: ['🟢 Tidak (0)', '🔴 Ya (1)'],
-                    en: ['🟢 No (0)', '🔴 Yes (1)']
-                }
+                opts: { ms: ['🟢 Tidak (0)', '🔴 Ya (1)'], en: ['🟢 No (0)', '🔴 Yes (1)'] }
             },
             { 
                 type: 'g', 
                 spacerTitle: 'Saringan GAD-2', 
                 instruction: {
                     ms: 'Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-red-600 bg-red-100 px-2 rounded uppercase">2 Minggu Lepas</span>.',
-                    en: 'Over the <span class="font-extrabold text-red-600 bg-red-100 px-2 rounded uppercase">PAST 2 WEEKS</span>, how often have you been bothered by any of the following problems?'
+                    en: 'Over the last 2 weeks, how often have you been bothered by any of the following problems?'
                 },
                 q: {
                     ms: '3. <span class="text-red-600 font-bold">(2 MINGGU LEPAS)</span> Berasa resah, gelisah atau tegang.',
@@ -316,23 +314,62 @@
                 .then(data => populateInitialData(data))
                 .catch(err => {
                     console.error("Error loading data:", err);
-                    showCustomAlert("Gagal menghubungi pangkalan data. Sila semak sambungan internet anda.", "Ralat Sistem");
+                    showCustomAlert(
+                        currentLang === 'en' ? "Failed to contact database. Check your internet connection." : "Gagal menghubungi pangkalan data. Sila semak sambungan internet anda.", 
+                        currentLang === 'en' ? "System Error" : "Ralat Sistem"
+                    );
                 });
                 
             renderQ(qAwal, 'awalContainer', 'awal');
         };
         
+        // --- TRANSLATION CONTROLLER ---
+        function toggleLanguage() {
+            currentLang = currentLang === 'ms' ? 'en' : 'ms';
+            document.getElementById('langText').innerText = currentLang === 'ms' ? 'EN' : 'MS';
+
+            // 1. Translate all generic static text and tags
+            document.querySelectorAll('.trans').forEach(el => {
+                if (el.dataset[currentLang]) {
+                    el.innerHTML = el.dataset[currentLang];
+                }
+            });
+
+            // 2. Translate placeholders in inputs
+            document.querySelectorAll('.trans-placeholder').forEach(el => {
+                if (el.dataset[`${currentLang}Placeholder`]) {
+                    el.placeholder = el.dataset[`${currentLang}Placeholder`];
+                }
+            });
+
+            // 3. Update dynamic labels (Alamat)
+            toggleAlamat(); 
+
+            // 4. Re-render the active screening sections
+            if (!document.getElementById('partAwal').classList.contains('hidden')) {
+                renderQ(qAwal, 'awalContainer', 'awal');
+            }
+            if (!document.getElementById('partLanjut').classList.contains('hidden')) {
+                if (state.needsPHQ9) renderQ(qPHQ9, 'phqBox', 'phq');
+                if (state.needsGAD7) renderQ(qGAD5_Lanjut, 'gadBox', 'gad');
+            }
+        }
+
         function populateInitialData(data) {
             masterClinics = data.clinics;
             const daerahSel = document.getElementById('daerah');
             const uniqueDaerah = [...new Set(masterClinics.map(c => c.daerah))].sort();
-            daerahSel.innerHTML = '<option value="">-- Pilih Daerah --</option>';
+            
+            const defDaerah = currentLang === 'en' ? '-- Select District --' : '-- Pilih Daerah --';
+            daerahSel.innerHTML = `<option value="">${defDaerah}</option>`;
             uniqueDaerah.forEach(d => { daerahSel.innerHTML += `<option value="${d}">${d}</option>`; });
 
             const bangsaSel = document.getElementById('bangsaSelect');
-            bangsaSel.innerHTML = '<option value="">-- Pilih Bangsa --</option>';
+            const defBangsa = currentLang === 'en' ? '-- Select Race --' : '-- Pilih Bangsa --';
+            const lainBangsa = currentLang === 'en' ? 'Others (Please Specify)' : 'Lain-lain (Sila Nyatakan)';
+            bangsaSel.innerHTML = `<option value="">${defBangsa}</option>`;
             data.bangsa.forEach(b => { bangsaSel.innerHTML += `<option value="${b}">${b}</option>`; });
-            bangsaSel.innerHTML += `<option value="Lain-lain">Lain-lain (Sila Nyatakan)</option>`;
+            bangsaSel.innerHTML += `<option value="Lain-lain">${lainBangsa}</option>`;
 
             const kContainer = document.getElementById('komorbidContainer');
             kContainer.innerHTML = '';
@@ -346,10 +383,11 @@
                     </label>
                 `;
             });
+            const lainKomorbid = currentLang === 'en' ? 'Others (Specify)' : 'Lain-lain (Nyatakan)';
             kContainer.innerHTML += `
                 <label class="flex items-start space-x-2 cursor-pointer">
                     <input type="checkbox" id="cbLain" value="Lain-lain" onchange="handleKomorbid(this)" class="mt-1 komorbid-cb text-teal-600 rounded">
-                    <span class="text-sm text-gray-700">Lain-lain (Nyatakan)</span>
+                    <span class="text-sm text-gray-700">${lainKomorbid}</span>
                 </label>
             `;
 
@@ -358,7 +396,7 @@
                 btnGps.disabled = false;
                 btnGps.className = "text-xs bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded flex items-center transition";
                 document.getElementById('gpsIcon').className = "fas fa-location-arrow mr-1";
-                document.getElementById('gpsText').textContent = "Cari Klinik Berdekatan";
+                document.getElementById('gpsText').textContent = currentLang === 'en' ? "Find Nearby Clinic" : "Cari Klinik Berdekatan";
             }
         }
 
@@ -371,26 +409,31 @@
             
             btnRefresh.disabled = true;
             iconRefresh.classList.add('fa-spin');
-            daerahSel.innerHTML = '<option value="">Memuat turun data terkini...</option>';
-            fasSel.innerHTML = '<option value="">Pilih Daerah dahulu</option>';
+            daerahSel.innerHTML = currentLang === 'en' ? '<option value="">Loading latest data...</option>' : '<option value="">Memuat turun data terkini...</option>';
+            fasSel.innerHTML = currentLang === 'en' ? '<option value="">Select District first</option>' : '<option value="">Pilih Daerah dahulu</option>';
             fasSel.disabled = true;
             
             fetch(GAS_API_URL + "?action=clearCache")
                 .then(res => res.json())
-                .then(() => {
-                    return fetch(GAS_API_URL + "?action=getInitialData");
-                })
+                .then(() => fetch(GAS_API_URL + "?action=getInitialData"))
                 .then(res => res.json())
                 .then(data => {
                     populateInitialData(data);
                     iconRefresh.classList.remove('fa-spin');
                     btnRefresh.disabled = false;
-                    showCustomAlert("Senarai fasiliti telah berjaya dikemaskini.", "Berjaya", true);
+                    showCustomAlert(
+                        currentLang === 'en' ? "Facility list successfully updated." : "Senarai fasiliti telah berjaya dikemaskini.", 
+                        currentLang === 'en' ? "Success" : "Berjaya", 
+                        true
+                    );
                 })
                 .catch(err => {
                     iconRefresh.classList.remove('fa-spin');
                     btnRefresh.disabled = false;
-                    showCustomAlert("Ralat: " + err.message, "Ralat Sistem");
+                    showCustomAlert(
+                        currentLang === 'en' ? "Error updating data: " + err.message : "Ralat ketika memuat turun data baru: " + err.message, 
+                        currentLang === 'en' ? "System Error" : "Ralat Sistem"
+                    );
                 });
         }
 
@@ -398,7 +441,7 @@
             const d = document.getElementById('daerah').value;
             const fasSel = document.getElementById('fasiliti');
             
-            fasSel.innerHTML = '<option value="">-- Pilih Fasiliti --</option>';
+            fasSel.innerHTML = currentLang === 'en' ? '<option value="">-- Select Facility --</option>' : '<option value="">-- Pilih Fasiliti --</option>';
             fasSel.disabled = !d;
 
             if(d) {
@@ -446,7 +489,8 @@
             const btnGps = document.getElementById('btnGps');
             const originalHtml = btnGps.innerHTML;
             
-            btnGps.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> Mencari...`;
+            const btnText = currentLang === 'en' ? "Searching..." : "Mencari...";
+            btnGps.innerHTML = `<i class="fas fa-spinner fa-spin mr-1"></i> ${btnText}`;
             btnGps.disabled = true;
 
             if (navigator.geolocation) {
@@ -466,9 +510,16 @@
                             document.getElementById('daerah').value = closest.daerah;
                             updateFasiliti();
                             document.getElementById('fasiliti').value = closest.fasiliti;
-                            showCustomAlert(`GPS menemui fasiliti terdekat: ${closest.fasiliti} (${closest.distance.toFixed(1)} km)`, "Berjaya", true);
+                            showCustomAlert(
+                                currentLang === 'en' ? `GPS found nearest facility: ${closest.fasiliti} (${closest.distance.toFixed(1)} km)` : `GPS menemui fasiliti terdekat: ${closest.fasiliti} (${closest.distance.toFixed(1)} km)`, 
+                                currentLang === 'en' ? "Success" : "Berjaya", 
+                                true
+                            );
                         } else {
-                            showCustomAlert("Sistem gagal mengira jarak. Tiada koordinat klinik dalam pangkalan data.", "Ralat Data");
+                            showCustomAlert(
+                                currentLang === 'en' ? "System failed to calculate distance. No coordinates found." : "Sistem gagal mengira jarak. Tiada koordinat klinik dalam pangkalan data.", 
+                                currentLang === 'en' ? "Data Error" : "Ralat Data"
+                            );
                         }
                         btnGps.innerHTML = originalHtml;
                         btnGps.disabled = false;
@@ -476,16 +527,20 @@
                     error => { 
                         btnGps.innerHTML = originalHtml;
                         btnGps.disabled = false;
-                        let errMsg = "Akses lokasi ditolak atau gagal.";
-                        if (error.code === 1) errMsg = "Sistem pelayar menyekat akses GPS.";
-                        if (error.code === 2) errMsg = "Signal GPS tidak ditemui.";
-                        if (error.code === 3) errMsg = "Carian GPS Timeout.";
-                        showCustomAlert(errMsg, "Ralat GPS"); 
+                        let errMsg = currentLang === 'en' ? "Location access denied or failed." : "Akses lokasi ditolak atau gagal.";
+                        if (error.code === 1) errMsg = currentLang === 'en' ? "Browser blocked GPS access." : "Sistem pelayar menyekat akses GPS.";
+                        if (error.code === 2) errMsg = currentLang === 'en' ? "No GPS signal found." : "Signal GPS tidak ditemui.";
+                        if (error.code === 3) errMsg = currentLang === 'en' ? "GPS Search Timeout." : "Carian GPS Timeout.";
+                        
+                        showCustomAlert(errMsg, currentLang === 'en' ? "GPS Error" : "Ralat GPS"); 
                     },
                     { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
                 );
             } else {
-                showCustomAlert("Peranti anda tidak menyokong fungsi GPS.", "Ralat Sistem");
+                showCustomAlert(
+                    currentLang === 'en' ? "Your device does not support GPS." : "Peranti anda tidak menyokong fungsi GPS.", 
+                    currentLang === 'en' ? "System Error" : "Ralat Sistem"
+                );
                 btnGps.innerHTML = originalHtml;
                 btnGps.disabled = false;
             }
@@ -501,7 +556,12 @@
 
         function toggleAlamat() {
             const isStaff = document.querySelector('input[name="kategori"]:checked').value.includes("Kakitangan");
-            document.getElementById('labelAlamat').textContent = isStaff ? "Tempat Bertugas (Bahagian/Cawangan/Unit/Fasiliti)" : "Alamat Kediaman";
+            const label = document.getElementById('labelAlamat');
+            if (isStaff) {
+                label.innerHTML = currentLang === 'en' ? 'Workplace (Division/Branch/Unit/Facility)<span class="text-red-500">*</span>' : 'Tempat Bertugas (Bahagian/Cawangan/Unit/Fasiliti)<span class="text-red-500">*</span>';
+            } else {
+                label.innerHTML = currentLang === 'en' ? 'Residential Address<span class="text-red-500">*</span>' : 'Alamat Kediaman<span class="text-red-500">*</span>';
+            }
         }
 
         function handleWarganegara() {
@@ -516,12 +576,12 @@
             if(isWarga) {
                 umurInput.classList.add('bg-gray-100');
                 jantinaInput.classList.add('bg-gray-100');
-                icInput.placeholder = "Contoh: 801231125678";
+                icInput.placeholder = currentLang === 'en' ? "Example: 801231125678" : "Contoh: 801231125678";
                 extractIC(); 
             } else {
                 umurInput.classList.remove('bg-gray-100');
                 jantinaInput.classList.remove('bg-gray-100');
-                icInput.placeholder = "Sila masukkan No. Passport";
+                icInput.placeholder = currentLang === 'en' ? "Enter Passport No." : "Sila masukkan No. Passport";
                 document.getElementById('icError').classList.add('hidden'); 
                 umurInput.value = "";
                 jantinaInput.value = "";
@@ -576,7 +636,7 @@
             const btn = document.getElementById("btnMulaSaringan");
             const originalBtnHtml = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...`;
+            btn.innerHTML = currentLang === 'en' ? `<i class="fas fa-spinner fa-spin mr-2"></i> Processing...` : `<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...`;
 
             const unlockBtn = () => {
                 btn.disabled = false;
@@ -595,17 +655,26 @@
                                   (document.getElementById('bangsaSelect').value !== "Lain-lain" || document.getElementById('bangsaLain').value.trim() !== "");
 
             if (!fasiliti || !nama || !ic || !telefon || !umur || !jantina || !komorbid || !alamat || !isBangsaValid) {
-                showCustomAlert("Sila lengkapkan semua data demografi.", "Maklumat Tidak Lengkap"); 
+                showCustomAlert(
+                    currentLang === 'en' ? "Please complete all demographic fields." : "Sila lengkapkan semua data demografi.", 
+                    currentLang === 'en' ? "Incomplete Information" : "Maklumat Tidak Lengkap"
+                ); 
                 return unlockBtn();
             }
 
             if (!document.getElementById('icError').classList.contains('hidden')) {
-                showCustomAlert("Sila betulkan format No. KP / Passport anda.", "Format Tidak Sah");
+                showCustomAlert(
+                    currentLang === 'en' ? "Please correct your IC / Passport format." : "Sila betulkan format No. KP / Passport anda.", 
+                    currentLang === 'en' ? "Invalid Format" : "Format Tidak Sah"
+                );
                 return unlockBtn();
             }
 
             if (parseInt(umur) <= 12) {
-                showCustomAlert("Saringan ini dikhaskan untuk 13 tahun ke atas.", "Had Umur");
+                showCustomAlert(
+                    currentLang === 'en' ? "This screening is for individuals aged 13 and above." : "Saringan ini dikhaskan untuk 13 tahun ke atas.", 
+                    currentLang === 'en' ? "Age Limit" : "Had Umur"
+                );
                 document.getElementById('umur').classList.remove('bg-gray-100');
                 document.getElementById('umur').classList.add('border-red-500', 'bg-white');
                 return unlockBtn();
@@ -631,13 +700,11 @@
             window.scrollTo({ top: 0, behavior: 'smooth' }); 
         }
 
-        // --- QUESTION RENDERER ---
         function renderQ(qArray, containerId, prefix) {
             let html = '';
             qArray.forEach((item, i) => {
                 
                 if (typeof item === 'object' && item.type) {
-                    // Handle complex questions (Whooley/GAD-2)
                     if (item.spacerTitle) {
                         html += `<div class="flex items-center py-4">
                                     <div class="flex-grow border-t-2 border-dashed border-teal-200"></div>
@@ -655,7 +722,6 @@
                     }
                 }
 
-                // Extract text based on current language
                 let qText = "";
                 let opts = [];
 
@@ -676,7 +742,6 @@
                             <div class="${gridClass}">`;
                 
                 opts.forEach((opt, v) => {
-                    // Read existing checked state to maintain selections during translation
                     const isChecked = document.querySelector(`input[name="${prefix}_${i}"][value="${v}"]`)?.checked ? 'checked' : '';
                     
                     html += `<div>
@@ -694,7 +759,10 @@
             state.gad2Answers = getAns('awal', 2, 2); 
             
             if(state.whooleyAnswers.includes(NaN) || state.gad2Answers.includes(NaN)) { 
-                showCustomAlert("Sila jawab semua soalan Whooley dan GAD-2.", "Soalan Belum Lengkap"); 
+                showCustomAlert(
+                    currentLang === 'en' ? "Please answer all Whooley and GAD-2 questions." : "Sila jawab semua soalan Whooley dan GAD-2.", 
+                    currentLang === 'en' ? "Incomplete Questions" : "Soalan Belum Lengkap"
+                ); 
                 return; 
             }
             
@@ -703,10 +771,12 @@
 
             if(state.needsPHQ9 || state.needsGAD7) {
                 let html = ''; 
+                const instTitle = currentLang === 'en' ? "Instructions:" : "Arahan:";
+                const instText = currentLang === 'en' ? 'Over the last 2 weeks, how often have you been bothered by any of the following problems?' : 'Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-red-600 bg-red-100 px-2 rounded">2 MINGGU LEPAS</span>.';
                 const blueBoxTemplate = `
                     <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4 rounded-lg">
-                        <p class="font-bold text-blue-900">Arahan:</p>
-                        <p class="text-sm text-blue-800 mt-1">Sila jawab soalan berikut berdasarkan pengalaman anda dalam tempoh <span class="font-extrabold text-red-600 bg-red-100 px-2 rounded">2 MINGGU LEPAS</span>.</p>
+                        <p class="font-bold text-blue-900">${instTitle}</p>
+                        <p class="text-sm text-blue-800 mt-1">${instText}</p>
                     </div>`;
                             
                 if(state.needsPHQ9) { 
@@ -751,7 +821,6 @@
 
         let isSubmittingData = false;
 
-        // --- SUBMIT VIA POST FETCH API ---
         function submitFinal() {
             if (isSubmittingData) return; 
             isSubmittingData = true;
@@ -761,7 +830,10 @@
 
             if ((state.needsPHQ9 && state.phq9Answers.includes(NaN)) || 
                 (state.needsGAD7 && state.gad7Answers.includes(NaN))) { 
-                showCustomAlert("Sila lengkapkan semua soalan saringan lanjut.", "Soalan Belum Lengkap"); 
+                showCustomAlert(
+                    currentLang === 'en' ? "Please complete all advanced screening questions." : "Sila lengkapkan semua soalan saringan lanjut.", 
+                    currentLang === 'en' ? "Incomplete Questions" : "Soalan Belum Lengkap"
+                ); 
                 isSubmittingData = false; 
                 return; 
             }
@@ -816,14 +888,14 @@
                 if (data.success) {
                     showResultUI(data);
                 } else {
-                    showCustomAlert("Ralat menyimpan data: " + data.error, "Ralat Sistem");
+                    showCustomAlert("Error saving data: " + data.error, "System Error");
                     document.getElementById('actionButtonsLanjut').classList.remove('hidden');
                     document.getElementById('loadingSubmit').classList.add('hidden');
                 }
             })
             .catch(err => {
                 isSubmittingData = false;
-                showCustomAlert("Masalah rangkaian (Network Error). Sila cuba lagi.", "Ralat Sistem");
+                showCustomAlert("Network Error. Please try again.", "System Error");
                 document.getElementById('actionButtonsLanjut').classList.remove('hidden');
                 document.getElementById('loadingSubmit').classList.add('hidden');
             });
@@ -844,14 +916,16 @@
             document.getElementById('sectionResult').classList.replace('hidden-section', 'visible-section');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
-            let html = `<p class="text-xl text-green-600 font-bold mb-4">Terima Kasih, maklumat telah direkodkan ke ${document.getElementById('fasiliti').value}.</p>`;
+            const successMsg = currentLang === 'en' ? `Thank you, your information has been recorded to ${document.getElementById('fasiliti').value}.` : `Terima Kasih, maklumat telah direkodkan ke ${document.getElementById('fasiliti').value}.`;
+            let html = `<p class="text-xl text-green-600 font-bold mb-4">${successMsg}</p>`;
             
             if(state.suicideRisk || state.needsPHQ9 || state.needsGAD7) {
                 document.getElementById('riskAlert').classList.remove('hidden');
             } else {
+                const healthyMsg = currentLang === 'en' ? "Your Mental Health status is satisfactory. Keep up the healthy lifestyle!" : "Status Kesihatan Mental anda memuaskan. Teruskan gaya hidup sihat!";
                 html += `<div class="bg-green-50 p-6 rounded-lg text-green-800 text-center">
                             <i class="fas fa-smile text-4xl mb-3 block"></i>
-                            <p>Status Kesihatan Mental anda memuaskan. Teruskan gaya hidup sihat!</p>
+                            <p>${healthyMsg}</p>
                          </div>`;
             }
 
@@ -866,20 +940,27 @@
             hours = hours ? hours : 12; 
             const tarikhTimestamp = `${day}/${month}/${year}, ${hours}:${minutes} ${ampm}`;
             
-            const whooleyText = state.needsPHQ9 ? `<span class="text-red-600 font-bold">Berisiko</span>` : `<span class="text-green-600 font-bold">Tidak Berisiko</span>`;
-            const gadText = state.needsGAD7 ? `<span class="text-red-600 font-bold">Berisiko</span>` : `<span class="text-green-600 font-bold">Tidak Berisiko</span>`;
+            const riskWord = currentLang === 'en' ? "At Risk" : "Berisiko";
+            const noRiskWord = currentLang === 'en' ? "Not at Risk" : "Tidak Berisiko";
+            const whooleyText = state.needsPHQ9 ? `<span class="text-red-600 font-bold">${riskWord}</span>` : `<span class="text-green-600 font-bold">${noRiskWord}</span>`;
+            const gadText = state.needsGAD7 ? `<span class="text-red-600 font-bold">${riskWord}</span>` : `<span class="text-green-600 font-bold">${noRiskWord}</span>`;
             
+            const summaryTitle = currentLang === 'en' ? "View Clinical Summary (Staff)" : "Papar Ringkasan Klinikal (Kakitangan)";
+            const nameTitle = currentLang === 'en' ? "Name" : "Nama";
+            const dateTitle = currentLang === 'en' ? "Date" : "Tarikh Saringan";
+            const ansSeries = currentLang === 'en' ? "Answer Series:" : "Siri Jawapan:";
+
             let summaryHtml = `
                 <div class="mt-8 border-t pt-4">
                     <button onclick="toggleSummary()" class="text-teal-700 hover:text-teal-900 font-semibold text-sm underline flex items-center justify-center w-full transition-colors">
-                        <i class="fas fa-notes-medical mr-2"></i> Papar Ringkasan Klinikal (Kakitangan)
+                        <i class="fas fa-notes-medical mr-2"></i> ${summaryTitle}
                     </button>
                     <div id="clinicalSummaryBox" class="hidden mt-4 bg-gray-50 border border-gray-200 rounded-xl p-5 text-left text-sm text-gray-800 shadow-inner">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 border-b pb-4">
-                            <p><span class="text-gray-500 text-xs block uppercase tracking-wider">Nama</span><span class="font-bold uppercase">${document.getElementById('nama').value}</span></p>
+                            <p><span class="text-gray-500 text-xs block uppercase tracking-wider">${nameTitle}</span><span class="font-bold uppercase">${document.getElementById('nama').value}</span></p>
                             <p><span class="text-gray-500 text-xs block uppercase tracking-wider">No. KP / Passport</span><span class="font-bold">${document.getElementById('ic').value}</span></p>
                             <p><span class="text-gray-500 text-xs block uppercase tracking-wider">No. Telefon</span><span class="font-bold">${document.getElementById('telefon').value}</span></p>
-                            <p><span class="text-gray-500 text-xs block uppercase tracking-wider">Tarikh Saringan</span><span class="font-bold">${tarikhTimestamp}</span></p>
+                            <p><span class="text-gray-500 text-xs block uppercase tracking-wider">${dateTitle}</span><span class="font-bold">${tarikhTimestamp}</span></p>
                         </div>
                         <div class="space-y-2">
                             <p class="flex justify-between border-b border-dashed border-gray-300 pb-1"><span>Saringan Whooley:</span> ${whooleyText}</p>
@@ -892,7 +973,7 @@
                 summaryHtml += `
                             <div class="bg-red-50 border border-red-100 p-3 rounded-lg mt-3">
                                 <p class="flex justify-between font-bold text-red-800 text-base border-b border-red-200 pb-1 mb-1"><span>Skor PHQ-9:</span> <span>${pScore}</span></p>
-                                <p class="text-xs text-red-600 leading-relaxed"><span class="font-semibold">Siri Jawapan:</span> ${phqSequenceStr}</p>
+                                <p class="text-xs text-red-600 leading-relaxed"><span class="font-semibold">${ansSeries}</span> ${phqSequenceStr}</p>
                             </div>`;
             }
 
@@ -901,7 +982,7 @@
                 summaryHtml += `
                             <div class="bg-orange-50 border border-orange-100 p-3 rounded-lg mt-3">
                                 <p class="flex justify-between font-bold text-orange-800 text-base border-b border-orange-200 pb-1 mb-1"><span>Skor GAD-7:</span> <span>${gScore}</span></p>
-                                <p class="text-xs text-orange-600"><span class="font-semibold">Siri Jawapan:</span> ${state.gad7Answers.join(', ')}</p>
+                                <p class="text-xs text-orange-600"><span class="font-semibold">${ansSeries}</span> ${state.gad7Answers.join(', ')}</p>
                             </div>`;
             }
 
@@ -952,20 +1033,6 @@
                 alertBox.classList.add('hidden');
                 alertBox.classList.remove('flex');
             }, 200); 
-        }
-
-        function toggleLanguage() {
-            currentLang = currentLang === 'ms' ? 'en' : 'ms';
-            document.getElementById('langText').innerText = currentLang === 'ms' ? 'EN' : 'MS';
-
-            // Re-render the active screening sections
-            if (!document.getElementById('partAwal').classList.contains('hidden')) {
-                renderQ(qAwal, 'awalContainer', 'awal');
-            }
-            if (!document.getElementById('partLanjut').classList.contains('hidden')) {
-                if (state.needsPHQ9) renderQ(qPHQ9, 'phqBox', 'phq');
-                if (state.needsGAD7) renderQ(qGAD5_Lanjut, 'gadBox', 'gad');
-            }
         }
     </script>
 </body>
